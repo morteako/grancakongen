@@ -14,7 +14,13 @@ import {
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { EffortTable } from "./components/EffortTable/EffortTable";
 import useSWR from "swr";
-import { Athlete, ClubEfforts, Effort, LeaderboardEffort } from "./types";
+import {
+  Athlete,
+  ClubEfforts,
+  Effort,
+  LeaderboardEffort,
+  Segment,
+} from "./types";
 
 const clubLinkName = "invitationals";
 
@@ -41,33 +47,40 @@ const getEffortRankMap = (efforts: Effort[]) => {
 const calculateScore = (efforts: LeaderboardEffort[]) =>
   efforts.reduce((sum, effort) => sum + effort.points, 0);
 
-const calculateLeaderboard = (efforts: ClubEfforts) => {
+const calculateLeaderboard = (
+  efforts: ClubEfforts,
+  activityType: "run" | "ride"
+) => {
   const athletes: { [profile: string]: Athlete } = {};
+
+  const filteredEfforts = efforts.efforts.filter(
+    (e) => e.segment.type === activityType
+  );
 
   // Set/count athletes on the athletes
 
-  efforts.efforts.map((segmentEffort) => {
-    segmentEffort.efforts.map((effort) => {
+  filteredEfforts.map((segmentEffort) => {
+    return segmentEffort.efforts.map((effort) => {
       athletes[effort.profile] = {
         name: effort.name,
         profile: effort.profile,
         efforts: {},
         totalPoints: 0,
       };
+      return null;
     });
-    console.log("athletes:", athletes);
   });
 
   const numAthletes = Object.entries(athletes).length;
 
-  efforts.efforts.map((segmentEffort) => {
+  filteredEfforts.map((segmentEffort) => {
     const effortRankMap = getEffortRankMap(segmentEffort.efforts);
 
-    segmentEffort.efforts.map((effort) => {
-      athletes[effort.profile].efforts[segmentEffort.segment.id] = {
+    return segmentEffort.efforts.map((effort) => {
+      return (athletes[effort.profile].efforts[segmentEffort.segment.id] = {
         points: numAthletes - effortRankMap[correctDuration(effort.duration)],
         effort,
-      };
+      });
     });
   });
 
@@ -87,13 +100,20 @@ export const App = () => {
     api.fetchEfforts(clubLinkName)
   );
 
+  const [leaderboard, setLeaderboard] = React.useState([] as Athlete[]);
+  const [segments, setSegments] = React.useState([] as Segment[]);
+
   console.log("efforts:", efforts);
 
   React.useEffect(() => {
     if (efforts) {
-      const leaderboard = calculateLeaderboard(efforts);
+      const leaderboard = calculateLeaderboard(efforts, "run");
+      setLeaderboard(leaderboard);
 
-      console.log("leaderboard:", leaderboard);
+      const segments = efforts.efforts
+        .map((effort) => effort.segment)
+        .filter((segment) => segment.type === "run");
+      setSegments(segments);
     }
   }, [efforts]);
 
@@ -110,7 +130,7 @@ export const App = () => {
 
             <TabPanels>
               <TabPanel>
-                <EffortTable />
+                <EffortTable leaderboard={leaderboard} segments={segments} />
               </TabPanel>
               <TabPanel>
                 <Text>Ride</Text>
