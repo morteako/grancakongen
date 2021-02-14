@@ -3,13 +3,15 @@ import * as api from "./api";
 import {
   ChakraProvider,
   Text,
-  theme,
+  // theme,
   Tabs,
   TabList,
   Tab,
   TabPanel,
   TabPanels,
   Box,
+  Grid,
+  extendTheme,
 } from "@chakra-ui/react";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { EffortTable } from "./components/EffortTable/EffortTable";
@@ -21,6 +23,7 @@ import {
   LeaderboardEffort,
   Segment,
 } from "./types";
+import { Logo } from "./Logo";
 
 const clubLinkName = "invitationals";
 
@@ -108,6 +111,22 @@ const calculateLeaderboard = (
   return leaderboard;
 };
 
+const theme = extendTheme({
+  colors: {
+    strava: {
+      100: "#fc5200",
+      200: "#fc5200",
+      300: "#fc5200",
+      400: "#fc5200",
+      500: "#fc5200",
+      600: "#fc5200",
+      700: "#fc5200",
+      800: "#fc5200",
+      900: "#fc5200",
+    },
+  },
+});
+
 export const App = () => {
   const { data: efforts } = useSWR("efforts", () =>
     api.fetchEfforts(clubLinkName)
@@ -131,9 +150,13 @@ export const App = () => {
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">
-        <ColorModeSwitcher justifySelf="flex-end" />
+        <Grid templateColumns="1fr 2fr 1fr">
+          <Text></Text>
+          <Logo />
+          <ColorModeSwitcher justifySelf="flex-end" />
+        </Grid>
         {efforts ? (
-          <Tabs colorScheme="orange" isFitted>
+          <Tabs isFitted colorScheme="strava">
             <TabList>
               <Tab>Runs</Tab>
               <Tab isDisabled>Rides</Tab>

@@ -8,6 +8,7 @@ import {
   Td,
   Th,
   Thead,
+  Tooltip,
   Tr,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
@@ -175,7 +176,9 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
             <Td>{athlete.totalPoints}</Td>
             <Td>
               <Link href={`http://www.strava.com${athlete.profile}`}>
-                {athlete.name.split(" ")[0]}
+                <Tooltip label={athlete.name} placement="left">
+                  {athlete.name.split(" ")[0]}
+                </Tooltip>
               </Link>
             </Td>
             {segments.map((segment, i) => {
