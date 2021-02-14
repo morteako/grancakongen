@@ -1,5 +1,24 @@
-import { Link, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import React from "react";
+import {
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+  ArrowUpIcon,
+  ChevronDownIcon,
+  MinusIcon,
+  UpDownIcon,
+} from "@chakra-ui/icons";
+import {
+  Button,
+  Flex,
+  IconButton,
+  Link,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import React, { useState } from "react";
 import { Athlete, Segment } from "../../types";
 
 interface Props {
@@ -7,9 +26,52 @@ interface Props {
   segments: Segment[];
 }
 
+type SortBy =
+  | {
+      type: "rank";
+      inverted: boolean;
+    }
+  | {
+      type: "name";
+      inverted: boolean;
+    }
+  | {
+      type: "segment";
+      inverted: boolean;
+      segmentId: string;
+    };
+
+const sortLeaderboard = (leaderboard: Athlete[], sortBy: SortBy) => {
+  switch (sortBy.type) {
+    case "name":
+      return leaderboard.sort((a, b) => a.name.localeCompare(b.name));
+    case "rank":
+      return leaderboard.sort((a, b) => a.rank - b.rank);
+    case "segment":
+      return leaderboard;
+  }
+};
+
+const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
+  sortBy.type === type ? (
+    sortBy.inverted ? (
+      <ArrowUpIcon />
+    ) : (
+      <ArrowDownIcon />
+    )
+  ) : (
+    <ArrowUpDownIcon />
+  );
+
 export const EffortTable = ({ leaderboard, segments }: Props) => {
   console.log("leaderboard:", leaderboard);
   console.log("segments:", segments);
+
+  const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
+
+  const sortedLeaderboard = sortBy.inverted
+    ? sortLeaderboard(leaderboard, sortBy).reverse()
+    : sortLeaderboard(leaderboard, sortBy);
 
   const colorStrength = 400;
   const medalColors = ["yellow", "gray", "orange"];
@@ -17,9 +79,41 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
     <Table>
       <Thead>
         <Tr>
-          <Th>Rank</Th>
+          <Th>
+            <Flex justifyContent="space-between" alignItems="center">
+              Rank
+              <IconButton
+                aria-label="sort"
+                size="xs"
+                icon={getIcon(sortBy, "rank")}
+                onClick={() =>
+                  setSortBy(
+                    sortBy.type === "rank"
+                      ? { type: "rank", inverted: !sortBy.inverted }
+                      : { type: "rank", inverted: false }
+                  )
+                }
+              />
+            </Flex>
+          </Th>
           <Th>Points</Th>
-          <Th>Name</Th>
+          <Th>
+            <Flex justifyContent="space-between" alignItems="center">
+              Name{" "}
+              <IconButton
+                aria-label="sort"
+                size="xs"
+                icon={getIcon(sortBy, "name")}
+                onClick={() =>
+                  setSortBy(
+                    sortBy.type === "name"
+                      ? { type: "name", inverted: !sortBy.inverted }
+                      : { type: "name", inverted: false }
+                  )
+                }
+              />
+            </Flex>
+          </Th>
           {segments.map((segment) => (
             <Th key={segment.id}>
               <Link href={`http://www.strava.com/segments/${segment.id}`}>
@@ -30,7 +124,7 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
         </Tr>
       </Thead>
       <Tbody>
-        {leaderboard.map((athlete) => (
+        {sortedLeaderboard.map((athlete) => (
           <Tr key={athlete.profile}>
             <Td
               color={
