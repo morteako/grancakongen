@@ -77,7 +77,6 @@ const calculateLeaderboard = (
   filteredEfforts.map((segmentEffort) => {
     const effortRankMap = getEffortRankMap(segmentEffort.efforts);
 
-    console.log("effortRankMap", effortRankMap);
     return segmentEffort.efforts.map((effort) => {
       const rank = effortRankMap[correctDuration(effort.duration)];
       return (athletes[effort.profile].efforts[segmentEffort.segment.id] = {
@@ -116,8 +115,6 @@ export const App = () => {
 
   const [leaderboard, setLeaderboard] = React.useState([] as Athlete[]);
   const [segments, setSegments] = React.useState([] as Segment[]);
-
-  console.log("efforts:", efforts);
 
   React.useEffect(() => {
     if (efforts) {

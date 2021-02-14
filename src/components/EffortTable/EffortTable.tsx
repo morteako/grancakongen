@@ -80,9 +80,6 @@ const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
   );
 
 export const EffortTable = ({ leaderboard, segments }: Props) => {
-  console.log("leaderboard:", leaderboard);
-  console.log("segments:", segments);
-
   const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
 
   const sortedLeaderboard = sortBy.inverted
@@ -131,7 +128,7 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
             </Flex>
           </Th>
           {segments.map((segment) => (
-            <Th key={segment.id}>
+            <Th key={"segment-" + segment.id}>
               <Flex justifyContent="space-between" alignItems="center">
                 <Link href={`http://www.strava.com/segments/${segment.id}`}>
                   {segment.name}
@@ -181,14 +178,14 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
                 {athlete.name.split(" ")[0]}
               </Link>
             </Td>
-            {segments.map((segment) => {
+            {segments.map((segment, i) => {
               const segmentEffort = athlete.efforts[segment.id];
               const segmentRank = segmentEffort
                 ? segmentEffort.effort.localRank
                 : null;
               return segmentEffort ? (
                 <Td
-                  key={segment.id + athlete.profile}
+                  key={athlete.profile + "-seg-" + i}
                   color={
                     segmentRank && segmentRank <= 3
                       ? `${medalColors[segmentRank - 1]}.${colorStrength}`
@@ -202,7 +199,7 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
                   </Link>
                 </Td>
               ) : (
-                <Td>-</Td>
+                <Td key={athlete.profile + "-seg-" + i}>-</Td>
               );
             })}
           </Tr>
