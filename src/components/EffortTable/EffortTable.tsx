@@ -1,13 +1,5 @@
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import {
-  ArrowDownIcon,
-  ArrowUpDownIcon,
-  ArrowUpIcon,
-  ChevronDownIcon,
-  MinusIcon,
-  UpDownIcon,
-} from "@chakra-ui/icons";
-import {
-  Button,
   Flex,
   IconButton,
   Link,
@@ -123,7 +115,7 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
           <Th>Points</Th>
           <Th>
             <Flex justifyContent="space-between" alignItems="center">
-              Name{" "}
+              Name
               <IconButton
                 aria-label="sort"
                 size="xs"
@@ -186,7 +178,7 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
             <Td>{athlete.totalPoints}</Td>
             <Td>
               <Link href={`http://www.strava.com${athlete.profile}`}>
-                {athlete.name}
+                {athlete.name.split(" ")[0]}
               </Link>
             </Td>
             {segments.map((segment) => {
