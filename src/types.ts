@@ -6,6 +6,7 @@ export interface Effort {
   pace: string;
   bpm: string;
   duration: string;
+  localRank?: number;
 }
 
 export interface Segment {
@@ -43,4 +44,5 @@ export interface Athlete {
     [segmentId: string]: LeaderboardEffort;
   };
   totalPoints: number;
+  rank: number;
 }

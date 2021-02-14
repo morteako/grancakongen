@@ -10,8 +10,9 @@ interface Props {
 export const EffortTable = ({ leaderboard, segments }: Props) => {
   console.log("leaderboard:", leaderboard);
   console.log("segments:", segments);
-  //   const segments = leaderboard.reduce((segments, athlete) => [...segments, ...Object.values(athlete.efforts).filter(seg => seg.))
 
+  const colorStrength = 400;
+  const medalColors = ["yellow", "gray", "orange"];
   return (
     <Table>
       <Thead>
@@ -20,7 +21,7 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
           <Th>Points</Th>
           <Th>Name</Th>
           {segments.map((segment) => (
-            <Th>
+            <Th key={segment.id}>
               <Link href={`http://www.strava.com/segments/${segment.id}`}>
                 {segment.name}
               </Link>
@@ -30,8 +31,16 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
       </Thead>
       <Tbody>
         {leaderboard.map((athlete) => (
-          <Tr>
-            <Td>N/A</Td>
+          <Tr key={athlete.profile}>
+            <Td
+              color={
+                athlete.rank <= 3
+                  ? `${medalColors[athlete.rank - 1]}.${colorStrength}`
+                  : undefined
+              }
+            >
+              {athlete.rank}
+            </Td>
             <Td>{athlete.totalPoints}</Td>
             <Td>
               <Link href={`http://www.strava.com${athlete.profile}`}>
@@ -39,11 +48,23 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
               </Link>
             </Td>
             {segments.map((segment) => {
-              const effort = athlete.efforts[segment.id];
-              return effort ? (
-                <Td>
-                  <Link href={`http://strava.com${effort.effort.effort}`}>
-                    {effort.effort.duration}
+              const segmentEffort = athlete.efforts[segment.id];
+              const segmentRank = segmentEffort
+                ? segmentEffort.effort.localRank
+                : null;
+              return segmentEffort ? (
+                <Td
+                  key={segment.id + athlete.profile}
+                  color={
+                    segmentRank && segmentRank <= 3
+                      ? `${medalColors[segmentRank - 1]}.${colorStrength}`
+                      : undefined
+                  }
+                >
+                  <Link
+                    href={`http://strava.com${segmentEffort.effort.effort}`}
+                  >
+                    {segmentEffort.effort.duration}
                   </Link>
                 </Td>
               ) : (

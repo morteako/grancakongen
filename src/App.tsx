@@ -57,7 +57,7 @@ const calculateLeaderboard = (
     (e) => e.segment.type === activityType
   );
 
-  // Set/count athletes on the athletes
+  // Set/count athletes
 
   filteredEfforts.map((segmentEffort) => {
     return segmentEffort.efforts.map((effort) => {
@@ -66,6 +66,7 @@ const calculateLeaderboard = (
         profile: effort.profile,
         efforts: {},
         totalPoints: 0,
+        rank: 0,
       };
       return null;
     });
@@ -76,10 +77,12 @@ const calculateLeaderboard = (
   filteredEfforts.map((segmentEffort) => {
     const effortRankMap = getEffortRankMap(segmentEffort.efforts);
 
+    console.log("effortRankMap", effortRankMap);
     return segmentEffort.efforts.map((effort) => {
+      const rank = effortRankMap[correctDuration(effort.duration)];
       return (athletes[effort.profile].efforts[segmentEffort.segment.id] = {
-        points: numAthletes - effortRankMap[correctDuration(effort.duration)],
-        effort,
+        points: numAthletes - rank,
+        effort: { ...effort, localRank: rank + 1 },
       });
     });
   });
@@ -91,6 +94,17 @@ const calculateLeaderboard = (
       totalPoints: calculateScore(Object.values(athlete.efforts)),
     }))
     .sort((a, b) => b.totalPoints - a.totalPoints);
+
+  let lastNumPoints = 0;
+  for (let i = 0; i < leaderboard.length; i++) {
+    const athlete = leaderboard[i];
+    if (i !== 0 && athlete.totalPoints === lastNumPoints) {
+      athlete.rank = leaderboard[i - 1].rank;
+    } else {
+      athlete.rank = i + 1;
+      lastNumPoints = athlete.totalPoints;
+    }
+  }
 
   return leaderboard;
 };
