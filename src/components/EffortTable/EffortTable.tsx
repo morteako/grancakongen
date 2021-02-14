@@ -48,12 +48,36 @@ const sortLeaderboard = (leaderboard: Athlete[], sortBy: SortBy) => {
     case "rank":
       return leaderboard.sort((a, b) => a.rank - b.rank);
     case "segment":
-      return leaderboard;
+      return leaderboard.sort((a, b) => {
+        const aEffort = a.efforts[sortBy.segmentId];
+        const bEffort = b.efforts[sortBy.segmentId];
+
+        if (!aEffort && !bEffort) {
+          return 0;
+        } else if (aEffort && !bEffort) {
+          return -1;
+        } else if (!aEffort && bEffort) {
+          return 1;
+        } else {
+          return bEffort.points - aEffort.points;
+        }
+      });
   }
 };
 
 const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
   sortBy.type === type ? (
+    sortBy.inverted ? (
+      <ArrowUpIcon />
+    ) : (
+      <ArrowDownIcon />
+    )
+  ) : (
+    <ArrowUpDownIcon />
+  );
+
+const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
+  sortBy.type === "segment" && sortBy.segmentId === segmentId ? (
     sortBy.inverted ? (
       <ArrowUpIcon />
     ) : (
@@ -116,9 +140,33 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
           </Th>
           {segments.map((segment) => (
             <Th key={segment.id}>
-              <Link href={`http://www.strava.com/segments/${segment.id}`}>
-                {segment.name}
-              </Link>
+              <Flex justifyContent="space-between" alignItems="center">
+                <Link href={`http://www.strava.com/segments/${segment.id}`}>
+                  {segment.name}
+                </Link>
+
+                <IconButton
+                  aria-label="sort"
+                  size="xs"
+                  icon={getSegmentIcon(sortBy, segment.id)}
+                  onClick={() =>
+                    setSortBy(
+                      sortBy.type === "segment" &&
+                        sortBy.segmentId === segment.id
+                        ? {
+                            type: "segment",
+                            inverted: !sortBy.inverted,
+                            segmentId: segment.id,
+                          }
+                        : {
+                            type: "segment",
+                            inverted: false,
+                            segmentId: segment.id,
+                          }
+                    )
+                  }
+                />
+              </Flex>
             </Th>
           ))}
         </Tr>
