@@ -6,13 +6,14 @@ import {
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tooltip,
   Tr,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { Athlete, Segment } from "../../types";
+import { Athlete, Effort, Segment } from "../../types";
 
 interface Props {
   leaderboard: Athlete[];
@@ -69,6 +70,15 @@ const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
     <ArrowUpDownIcon />
   );
 
+const EffortTooltip = (effort: Effort) => {
+  return (
+    <Flex flexDir="column">
+      <Text>Rank: {effort.localRank}</Text>
+      <Text>Date: {effort.date}</Text>
+      <Text>HR: {effort.bpm}</Text>
+    </Flex>
+  );
+};
 const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
   sortBy.type === "segment" && sortBy.segmentId === segmentId ? (
     sortBy.inverted ? (
@@ -198,7 +208,12 @@ export const EffortTable = ({ leaderboard, segments }: Props) => {
                   <Link
                     href={`http://strava.com${segmentEffort.effort.effort}`}
                   >
-                    {segmentEffort.effort.duration}
+                    <Tooltip
+                      label={EffortTooltip(segmentEffort.effort)}
+                      placement="left"
+                    >
+                      {segmentEffort.effort.duration}
+                    </Tooltip>
                   </Link>
                 </Td>
               ) : (
