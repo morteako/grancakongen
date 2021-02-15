@@ -3,7 +3,6 @@ import * as api from "./api";
 import {
   ChakraProvider,
   Text,
-  // theme,
   Tabs,
   TabList,
   Tab,
@@ -12,6 +11,9 @@ import {
   Box,
   Grid,
   extendTheme,
+  Flex,
+  Center,
+  system,
 } from "@chakra-ui/react";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { EffortTable } from "./components/EffortTable/EffortTable";
@@ -24,6 +26,14 @@ import {
   Segment,
 } from "./types";
 import { Logo } from "./Logo";
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Switch,
+  useHistory,
+} from "react-router-dom";
+import { NavBar } from "./components/NavBar/NavBar";
 
 const clubLinkName = "invitationals";
 
@@ -112,6 +122,9 @@ const calculateLeaderboard = (
 };
 
 const theme = extendTheme({
+  config: {
+    useSystemColorMode: true,
+  },
   colors: {
     strava: {
       100: "#fc5200",
@@ -156,21 +169,18 @@ export const App = () => {
           <ColorModeSwitcher justifySelf="flex-end" />
         </Grid>
         {efforts ? (
-          <Tabs isFitted colorScheme="strava">
-            <TabList>
-              <Tab>Runs</Tab>
-              <Tab isDisabled>Rides</Tab>
-            </TabList>
-
-            <TabPanels>
-              <TabPanel>
+          <BrowserRouter>
+            <Switch>
+              <Route path="/segments">
+                <NavBar activePath="/segments" />
                 <EffortTable leaderboard={leaderboard} segments={segments} />
-              </TabPanel>
-              <TabPanel>
-                <Text>Ride</Text>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+              </Route>
+              <Route path="/invitationals">
+                <NavBar activePath="/invitationals" />
+                <Text>Invitationals</Text>
+              </Route>
+            </Switch>
+          </BrowserRouter>
         ) : (
           <Text>Loading..</Text>
         )}
