@@ -127,12 +127,15 @@ const getEffortRankMap = (efforts: InvitationalEffort[]) => {
 const calculateScore = (efforts: LeaderboardInvitationalEffort[]) =>
   efforts.reduce((sum, effort) => sum + effort.points, 0);
 
-const calculateLeaderboard = (efforts: ClubEfforts) => {
+const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
   const athletes: { [profile: string]: InvitationalAthlete } = {};
 
+  const filteredEfforts = efforts.invitationalEfforts.filter(
+    (effort) => effort.invitational.year === year
+  );
   // Set/count athletes
 
-  efforts.invitationalEfforts.map((invitationalEffort) => {
+  filteredEfforts.map((invitationalEffort) => {
     return invitationalEffort.efforts.map((effort) => {
       athletes[effort.profile] = {
         name: effort.name,
@@ -147,7 +150,7 @@ const calculateLeaderboard = (efforts: ClubEfforts) => {
 
   const numAthletes = Object.entries(athletes).length;
 
-  efforts.invitationalEfforts.map((invitationalEffort) => {
+  filteredEfforts.map((invitationalEffort) => {
     const effortRankMap = getEffortRankMap(invitationalEffort.efforts);
 
     return invitationalEffort.efforts.map((effort) => {
@@ -190,17 +193,19 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
     [] as Invitational[]
   );
 
+  const [year, setYear] = useState(2020);
+
   React.useEffect(() => {
     if (clubEfforts) {
-      const leaderboard = calculateLeaderboard(clubEfforts);
+      const leaderboard = calculateLeaderboard(clubEfforts, year);
       setLeaderboard(leaderboard);
 
-      const invitationals = clubEfforts.invitationalEfforts.map(
-        (effort) => effort.invitational
-      );
+      const invitationals = clubEfforts.invitationalEfforts
+        .filter((effort) => effort.invitational.year === year)
+        .map((effort) => effort.invitational);
       setInvitationals(invitationals);
     }
-  }, [clubEfforts]);
+  }, [clubEfforts, year]);
 
   const timeFilter = useLocation().search;
   const history = useHistory();
@@ -223,12 +228,13 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
         <Select
           onChange={(e) => {
             console.log("new val", e.target.value);
-            history.push({ search: `filter=${e.target.value}` });
+            history.push({ search: `filter=year&year=${e.target.value}` });
+            setYear(parseInt(e.target.value));
           }}
+          value={year}
         >
-          <option value="all_time">All-time</option>
-          <option value="year&year=2021">2021</option>
-          <option value="year&year=2020">2020</option>
+          <option value="2021">2021</option>
+          <option value="2020">2020</option>
         </Select>
       </Box>
       <Table>
