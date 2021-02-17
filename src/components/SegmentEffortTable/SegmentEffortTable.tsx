@@ -78,12 +78,13 @@ const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
     <ArrowUpDownIcon />
   );
 
-const EffortTooltip = (effort: SegmentEffort) => {
+const EffortTooltip = (effort: LeaderboardSegmentEffort) => {
   return (
     <Flex flexDir="column">
-      <Text>Rank: {effort.localRank}</Text>
-      <Text>Date: {effort.date}</Text>
-      <Text>HR: {effort.bpm}</Text>
+      <Text>Rank: {effort.effort.localRank}</Text>
+      <Text>Points: {effort.points}</Text>
+      <Text>Date: {effort.effort.date}</Text>
+      <Text>HR: {effort.effort.bpm}</Text>
     </Flex>
   );
 };
@@ -340,7 +341,7 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
                       href={`http://strava.com${segmentEffort.effort.effort}`}
                     >
                       <Tooltip
-                        label={EffortTooltip(segmentEffort.effort)}
+                        label={EffortTooltip(segmentEffort)}
                         placement="left"
                       >
                         {segmentEffort.effort.duration}

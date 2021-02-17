@@ -81,10 +81,11 @@ const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
     <ArrowUpDownIcon />
   );
 
-const EffortTooltip = (effort: InvitationalEffort) => {
+const EffortTooltip = (effort: LeaderboardInvitationalEffort) => {
   return (
     <Flex flexDir="column">
-      <Text>Rank: {effort.localRank}</Text>
+      <Text>Rank: {effort.effort.localRank}</Text>
+      <Text>Points: {effort.points}</Text>
     </Flex>
   );
 };
@@ -356,7 +357,7 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
                       href={`http://strava.com${invitationalEffort.effort.activity}`}
                     >
                       <Tooltip
-                        label={EffortTooltip(invitationalEffort.effort)}
+                        label={EffortTooltip(invitationalEffort)}
                         placement="left"
                       >
                         {invitationalEffort.effort.duration}
