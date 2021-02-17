@@ -1,7 +1,6 @@
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Center,
   Flex,
   IconButton,
   Link,
@@ -17,11 +16,16 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { Athlete, Effort, Segment } from "../../types";
+import {
+  SegmentAthlete,
+  SegmentEffort,
+  Segment,
+  ClubEfforts,
+  LeaderboardSegmentEffort,
+} from "../../types";
 
 interface Props {
-  leaderboard: Athlete[];
-  segments: Segment[];
+  clubEfforts: ClubEfforts;
 }
 
 type SortBy =
@@ -39,7 +43,7 @@ type SortBy =
       segmentId: string;
     };
 
-const sortLeaderboard = (leaderboard: Athlete[], sortBy: SortBy) => {
+const sortLeaderboard = (leaderboard: SegmentAthlete[], sortBy: SortBy) => {
   switch (sortBy.type) {
     case "name":
       return leaderboard.sort((a, b) => a.name.localeCompare(b.name));
@@ -74,7 +78,7 @@ const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
     <ArrowUpDownIcon />
   );
 
-const EffortTooltip = (effort: Effort) => {
+const EffortTooltip = (effort: SegmentEffort) => {
   return (
     <Flex flexDir="column">
       <Text>Rank: {effort.localRank}</Text>
@@ -99,7 +103,105 @@ const getTimeFilter = (searchParams: string) => {
   console.log("params:", params);
 };
 
-export const EffortTable = ({ leaderboard, segments }: Props) => {
+const correctDuration = (duration: string) => {
+  if (duration.includes("s")) {
+    const seconds = parseInt(duration.replace("s", ""));
+    return "0:" + (seconds < 10 ? "0" + seconds : seconds);
+  } else {
+    return duration;
+  }
+};
+
+const getEffortRankMap = (efforts: SegmentEffort[]) => {
+  const times = efforts.map((e) => {
+    return correctDuration(e.duration);
+  });
+
+  return times.reduce(
+    (map, time, i) => (map[time] ? map : { ...map, [time]: i }),
+    {} as { [time: string]: number }
+  );
+};
+
+const calculateScore = (efforts: LeaderboardSegmentEffort[]) =>
+  efforts.reduce((sum, effort) => sum + effort.points, 0);
+
+const calculateLeaderboard = (
+  efforts: ClubEfforts,
+  activityType: "run" | "ride"
+) => {
+  const athletes: { [profile: string]: SegmentAthlete } = {};
+
+  const filteredEfforts = efforts.segmentEfforts.filter(
+    (e) => e.segment.type === activityType
+  );
+
+  // Set/count athletes
+
+  filteredEfforts.map((segmentEffort) => {
+    return segmentEffort.efforts.map((effort) => {
+      athletes[effort.profile] = {
+        name: effort.name,
+        profile: effort.profile,
+        efforts: {},
+        totalPoints: 0,
+        rank: 0,
+      };
+      return null;
+    });
+  });
+
+  const numAthletes = Object.entries(athletes).length;
+
+  filteredEfforts.map((segmentEffort) => {
+    const effortRankMap = getEffortRankMap(segmentEffort.efforts);
+
+    return segmentEffort.efforts.map((effort) => {
+      const rank = effortRankMap[correctDuration(effort.duration)];
+      return (athletes[effort.profile].efforts[segmentEffort.segment.id] = {
+        points: numAthletes - rank,
+        effort: { ...effort, localRank: rank + 1 },
+      });
+    });
+  });
+
+  // Reversed
+  const leaderboard = Object.values(athletes)
+    .map((athlete) => ({
+      ...athlete,
+      totalPoints: calculateScore(Object.values(athlete.efforts)),
+    }))
+    .sort((a, b) => b.totalPoints - a.totalPoints);
+
+  let lastNumPoints = 0;
+  for (let i = 0; i < leaderboard.length; i++) {
+    const athlete = leaderboard[i];
+    if (i !== 0 && athlete.totalPoints === lastNumPoints) {
+      athlete.rank = leaderboard[i - 1].rank;
+    } else {
+      athlete.rank = i + 1;
+      lastNumPoints = athlete.totalPoints;
+    }
+  }
+
+  return leaderboard;
+};
+export const SegmentEffortTable = ({ clubEfforts }: Props) => {
+  const [leaderboard, setLeaderboard] = React.useState([] as SegmentAthlete[]);
+  const [segments, setSegments] = React.useState([] as Segment[]);
+
+  React.useEffect(() => {
+    if (clubEfforts) {
+      const leaderboard = calculateLeaderboard(clubEfforts, "run");
+      setLeaderboard(leaderboard);
+
+      const segments = clubEfforts.segmentEfforts
+        .map((effort) => effort.segment)
+        .filter((segment) => segment.type === "run");
+      setSegments(segments);
+    }
+  }, [clubEfforts]);
+
   const timeFilter = useLocation().search;
   const history = useHistory();
 

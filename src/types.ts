@@ -1,4 +1,4 @@
-export interface Effort {
+export interface SegmentEffort {
   name: string;
   profile: string;
   date: string;
@@ -15,33 +15,47 @@ export interface Segment {
   type: "run" | "ride";
 }
 
+export interface Invitational {
+  name: string;
+  id: string;
+  description: string;
+  segment: string;
+  type: "minor" | "major";
+  year: number;
+}
+
 export interface Club {
   name: string;
   linkName: string;
   id: string;
   segments: Segment[];
 }
-
-export interface SegmentEffort {
-  segment: Segment;
-  efforts: Effort[];
+export interface InvitationalEffort {
+  name: string;
+  profile: string;
+  activity: string;
+  duration: string;
 }
 
 export interface ClubEfforts {
   club: Club;
-  efforts: SegmentEffort[];
+  segmentEfforts: { segment: Segment; efforts: SegmentEffort[] }[];
+  invitationalEfforts: {
+    invitational: Invitational;
+    efforts: InvitationalEffort[];
+  }[];
 }
 
-export interface LeaderboardEffort {
+export interface LeaderboardSegmentEffort {
   points: number;
-  effort: Effort;
+  effort: SegmentEffort;
 }
 
-export interface Athlete {
+export interface SegmentAthlete {
   name: string;
   profile: string;
   efforts: {
-    [segmentId: string]: LeaderboardEffort;
+    [segmentId: string]: LeaderboardSegmentEffort;
   };
   totalPoints: number;
   rank: number;
