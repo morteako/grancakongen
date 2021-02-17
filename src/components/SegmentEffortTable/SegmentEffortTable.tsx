@@ -101,7 +101,6 @@ const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
 
 const getTimeFilter = (searchParams: string) => {
   const params = searchParams.split("&");
-  console.log("params:", params);
 };
 
 const correctDuration = (duration: string) => {
@@ -207,7 +206,6 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
   const history = useHistory();
 
   getTimeFilter(useLocation().search);
-  console.log("timeFilter:", timeFilter);
 
   const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
 

@@ -102,7 +102,6 @@ const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
 
 const getTimeFilter = (searchParams: string) => {
   const params = searchParams.split("&");
-  console.log("params:", params);
 };
 
 const correctDuration = (duration: string) => {
@@ -212,7 +211,6 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
   const history = useHistory();
 
   getTimeFilter(useLocation().search);
-  console.log("timeFilter:", timeFilter);
 
   const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
 
@@ -228,7 +226,6 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
       <Box width={["100%", "40%", "20%"]}>
         <Select
           onChange={(e) => {
-            console.log("new val", e.target.value);
             history.push({ search: `filter=year&year=${e.target.value}` });
             setYear(parseInt(e.target.value));
           }}
