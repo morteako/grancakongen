@@ -29,11 +29,11 @@ interface NavBarProps {
 }
 export const NavBar = ({ activePath }: NavBarProps) => (
   <Flex paddingBottom="5">
-    <NavBarItem path="/segments" activePath={activePath} title="Segments" />
     <NavBarItem
       path="/invitationals"
       activePath={activePath}
       title="Invitationals"
     />
+    <NavBarItem path="/segments" activePath={activePath} title="Segments" />
   </Flex>
 );

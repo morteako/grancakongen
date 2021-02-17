@@ -9,6 +9,14 @@ export interface SegmentEffort {
   localRank?: number;
 }
 
+export interface InvitationalEffort {
+  name: string;
+  profile: string;
+  activity: string;
+  duration: string;
+  localRank?: number;
+}
+
 export interface Segment {
   name: string;
   id: string;
@@ -30,12 +38,6 @@ export interface Club {
   id: string;
   segments: Segment[];
 }
-export interface InvitationalEffort {
-  name: string;
-  profile: string;
-  activity: string;
-  duration: string;
-}
 
 export interface ClubEfforts {
   club: Club;
@@ -51,11 +53,26 @@ export interface LeaderboardSegmentEffort {
   effort: SegmentEffort;
 }
 
+export interface LeaderboardInvitationalEffort {
+  points: number;
+  effort: InvitationalEffort;
+}
+
 export interface SegmentAthlete {
   name: string;
   profile: string;
   efforts: {
     [segmentId: string]: LeaderboardSegmentEffort;
+  };
+  totalPoints: number;
+  rank: number;
+}
+
+export interface InvitationalAthlete {
+  name: string;
+  profile: string;
+  efforts: {
+    [invitationalId: string]: LeaderboardInvitationalEffort;
   };
   totalPoints: number;
   rank: number;

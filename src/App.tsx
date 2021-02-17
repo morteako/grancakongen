@@ -3,6 +3,7 @@ import * as api from "./api";
 import { ChakraProvider, Text, Box, Grid, extendTheme } from "@chakra-ui/react";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { SegmentEffortTable } from "./components/SegmentEffortTable/SegmentEffortTable";
+import { InvitationalEffortTable } from "./components/InvitationalEffortTable/InvitationalEffortTable";
 import useSWR from "swr";
 import { Logo } from "./Logo";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
@@ -46,15 +47,15 @@ export const App = () => {
               <Route
                 exact
                 path="/"
-                render={() => <Redirect to="/segments" />}
+                render={() => <Redirect to="/invitationals" />}
               />
+              <Route path="/invitationals">
+                <NavBar activePath="/invitationals" />
+                <InvitationalEffortTable clubEfforts={data} />
+              </Route>
               <Route path="/segments">
                 <NavBar activePath="/segments" />
                 <SegmentEffortTable clubEfforts={data} />
-              </Route>
-              <Route path="/invitationals">
-                <NavBar activePath="/invitationals" />
-                <Text>Invitationals</Text>
               </Route>
             </Switch>
           </BrowserRouter>
