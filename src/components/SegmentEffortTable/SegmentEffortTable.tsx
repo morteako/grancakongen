@@ -1,10 +1,8 @@
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import {
-  Box,
   Flex,
   IconButton,
   Link,
-  Select,
   Table,
   Tbody,
   Td,
@@ -15,7 +13,6 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
 import {
   SegmentAthlete,
   SegmentEffort,
@@ -98,10 +95,6 @@ const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
   ) : (
     <ArrowUpDownIcon />
   );
-
-const getTimeFilter = (searchParams: string) => {
-  const params = searchParams.split("&");
-};
 
 const correctDuration = (duration: string) => {
   if (duration.includes("s")) {
@@ -202,11 +195,6 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
     }
   }, [clubEfforts]);
 
-  const timeFilter = useLocation().search;
-  const history = useHistory();
-
-  getTimeFilter(useLocation().search);
-
   const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
 
   const sortedLeaderboard = sortBy.inverted
@@ -218,18 +206,6 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
 
   return (
     <Flex flexDir="column" alignItems="center">
-      <Box width={["100%", "40%", "20%"]}>
-        <Select
-          onChange={(e) => {
-            console.log("new val", e.target.value);
-            history.push({ search: `filter=${e.target.value}` });
-          }}
-        >
-          <option value="all_time">All-time</option>
-          <option value="year&year=2021">2021</option>
-          <option value="year&year=2020">2020</option>
-        </Select>
-      </Box>
       <Table>
         <Thead>
           <Tr>

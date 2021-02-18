@@ -15,7 +15,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import {
   InvitationalAthlete,
   InvitationalEffort,
@@ -99,10 +99,6 @@ const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
   ) : (
     <ArrowUpDownIcon />
   );
-
-const getTimeFilter = (searchParams: string) => {
-  const params = searchParams.split("&");
-};
 
 const correctDuration = (duration: string) => {
   if (duration.includes("s")) {
@@ -207,10 +203,7 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
     }
   }, [clubEfforts, year]);
 
-  const timeFilter = useLocation().search;
   const history = useHistory();
-
-  getTimeFilter(useLocation().search);
 
   const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
 
