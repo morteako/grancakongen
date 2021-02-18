@@ -279,7 +279,7 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
                   <Tooltip label={invitational.description} placement="bottom">
                     {invitational.segment ? (
                       <Link
-                        href={`http://www.strava.com/segments/${invitational.segment}`}
+                        href={`http://www.strava.com${invitational.segment}`}
                       >
                         {invitational.name}
                       </Link>
@@ -350,16 +350,25 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
                         : undefined
                     }
                   >
-                    <Link
-                      href={`http://strava.com${invitationalEffort.effort.activity}`}
-                    >
+                    {invitationalEffort.effort.activity ? (
+                      <Link
+                        href={`http://strava.com${invitationalEffort.effort.activity}`}
+                      >
+                        <Tooltip
+                          label={EffortTooltip(invitationalEffort)}
+                          placement="left"
+                        >
+                          {invitationalEffort.effort.duration}
+                        </Tooltip>
+                      </Link>
+                    ) : (
                       <Tooltip
                         label={EffortTooltip(invitationalEffort)}
                         placement="left"
                       >
                         {invitationalEffort.effort.duration}
                       </Tooltip>
-                    </Link>
+                    )}
                   </Td>
                 ) : (
                   <Td key={athlete.profile + "-seg-" + i}>-</Td>
