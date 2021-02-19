@@ -1,25 +1,7 @@
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
-import {
-  Flex,
-  IconButton,
-  Link,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
-import {
-  SegmentAthlete,
-  SegmentEffort,
-  Segment,
-  ClubEfforts,
-  LeaderboardSegmentEffort,
-} from "../../types";
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
+import { Flex, IconButton, Link, Table, Tbody, Td, Text, Th, Thead, Tooltip, Tr } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { SegmentAthlete, SegmentEffort, Segment, ClubEfforts, LeaderboardSegmentEffort } from '../../types';
 
 interface Props {
   clubEfforts: ClubEfforts;
@@ -27,26 +9,26 @@ interface Props {
 
 type SortBy =
   | {
-      type: "rank";
+      type: 'rank';
       inverted: boolean;
     }
   | {
-      type: "name";
+      type: 'name';
       inverted: boolean;
     }
   | {
-      type: "segment";
+      type: 'segment';
       inverted: boolean;
       segmentId: string;
     };
 
 const sortLeaderboard = (leaderboard: SegmentAthlete[], sortBy: SortBy) => {
   switch (sortBy.type) {
-    case "name":
+    case 'name':
       return leaderboard.sort((a, b) => a.name.localeCompare(b.name));
-    case "rank":
+    case 'rank':
       return leaderboard.sort((a, b) => a.rank - b.rank);
-    case "segment":
+    case 'segment':
       return leaderboard.sort((a, b) => {
         const aEffort = a.efforts[sortBy.segmentId];
         const bEffort = b.efforts[sortBy.segmentId];
@@ -64,16 +46,8 @@ const sortLeaderboard = (leaderboard: SegmentAthlete[], sortBy: SortBy) => {
   }
 };
 
-const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
-  sortBy.type === type ? (
-    sortBy.inverted ? (
-      <ArrowUpIcon />
-    ) : (
-      <ArrowDownIcon />
-    )
-  ) : (
-    <ArrowUpDownIcon />
-  );
+const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
+  sortBy.type === type ? sortBy.inverted ? <ArrowUpIcon /> : <ArrowDownIcon /> : <ArrowUpDownIcon />;
 
 const EffortTooltip = (effort: LeaderboardSegmentEffort) => {
   return (
@@ -86,7 +60,7 @@ const EffortTooltip = (effort: LeaderboardSegmentEffort) => {
   );
 };
 const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
-  sortBy.type === "segment" && sortBy.segmentId === segmentId ? (
+  sortBy.type === 'segment' && sortBy.segmentId === segmentId ? (
     sortBy.inverted ? (
       <ArrowUpIcon />
     ) : (
@@ -97,42 +71,33 @@ const getSegmentIcon = (sortBy: SortBy, segmentId: string) =>
   );
 
 const correctDuration = (duration: string) => {
-  if (duration.includes("s")) {
-    const seconds = parseInt(duration.replace("s", ""));
-    return "0:" + (seconds < 10 ? "0" + seconds : seconds);
+  if (duration.includes('s')) {
+    const seconds = parseInt(duration.replace('s', ''));
+    return '0:' + (seconds < 10 ? '0' + seconds : seconds);
   } else {
     return duration;
   }
 };
 
 const getEffortRankMap = (efforts: SegmentEffort[]) => {
-  const times = efforts.map((e) => {
+  const times = efforts.map(e => {
     return correctDuration(e.duration);
   });
 
-  return times.reduce(
-    (map, time, i) => (map[time] ? map : { ...map, [time]: i }),
-    {} as { [time: string]: number }
-  );
+  return times.reduce((map, time, i) => (map[time] ? map : { ...map, [time]: i }), {} as { [time: string]: number });
 };
 
-const calculateScore = (efforts: LeaderboardSegmentEffort[]) =>
-  efforts.reduce((sum, effort) => sum + effort.points, 0);
+const calculateScore = (efforts: LeaderboardSegmentEffort[]) => efforts.reduce((sum, effort) => sum + effort.points, 0);
 
-const calculateLeaderboard = (
-  efforts: ClubEfforts,
-  activityType: "run" | "ride"
-) => {
+const calculateLeaderboard = (efforts: ClubEfforts, activityType: 'run' | 'ride') => {
   const athletes: { [profile: string]: SegmentAthlete } = {};
 
-  const filteredEfforts = efforts.segmentEfforts.filter(
-    (e) => e.segment.type === activityType
-  );
+  const filteredEfforts = efforts.segmentEfforts.filter(e => e.segment.type === activityType);
 
   // Set/count athletes
 
-  filteredEfforts.map((segmentEffort) => {
-    return segmentEffort.efforts.map((effort) => {
+  filteredEfforts.map(segmentEffort => {
+    return segmentEffort.efforts.map(effort => {
       athletes[effort.profile] = {
         name: effort.name,
         profile: effort.profile,
@@ -146,10 +111,10 @@ const calculateLeaderboard = (
 
   const numAthletes = Object.entries(athletes).length;
 
-  filteredEfforts.map((segmentEffort) => {
+  filteredEfforts.map(segmentEffort => {
     const effortRankMap = getEffortRankMap(segmentEffort.efforts);
 
-    return segmentEffort.efforts.map((effort) => {
+    return segmentEffort.efforts.map(effort => {
       const rank = effortRankMap[correctDuration(effort.duration)];
       return (athletes[effort.profile].efforts[segmentEffort.segment.id] = {
         points: numAthletes - rank,
@@ -160,7 +125,7 @@ const calculateLeaderboard = (
 
   // Reversed
   const leaderboard = Object.values(athletes)
-    .map((athlete) => ({
+    .map(athlete => ({
       ...athlete,
       totalPoints: calculateScore(Object.values(athlete.efforts)),
     }))
@@ -185,24 +150,24 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
 
   React.useEffect(() => {
     if (clubEfforts) {
-      const leaderboard = calculateLeaderboard(clubEfforts, "run");
+      const leaderboard = calculateLeaderboard(clubEfforts, 'run');
       setLeaderboard(leaderboard);
 
       const segments = clubEfforts.segmentEfforts
-        .map((effort) => effort.segment)
-        .filter((segment) => segment.type === "run");
+        .map(effort => effort.segment)
+        .filter(segment => segment.type === 'run');
       setSegments(segments);
     }
   }, [clubEfforts]);
 
-  const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
+  const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
 
   const sortedLeaderboard = sortBy.inverted
     ? sortLeaderboard(leaderboard, sortBy).reverse()
     : sortLeaderboard(leaderboard, sortBy);
 
   const colorStrength = 400;
-  const medalColors = ["yellow", "gray", "orange"];
+  const medalColors = ['yellow', 'gray', 'orange'];
 
   return (
     <Flex flexDir="column" alignItems="center">
@@ -215,12 +180,12 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
                 <IconButton
                   aria-label="sort"
                   size="xs"
-                  icon={getIcon(sortBy, "rank")}
+                  icon={getIcon(sortBy, 'rank')}
                   onClick={() =>
                     setSortBy(
-                      sortBy.type === "rank"
-                        ? { type: "rank", inverted: !sortBy.inverted }
-                        : { type: "rank", inverted: false }
+                      sortBy.type === 'rank'
+                        ? { type: 'rank', inverted: !sortBy.inverted }
+                        : { type: 'rank', inverted: false }
                     )
                   }
                 />
@@ -233,23 +198,21 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
                 <IconButton
                   aria-label="sort"
                   size="xs"
-                  icon={getIcon(sortBy, "name")}
+                  icon={getIcon(sortBy, 'name')}
                   onClick={() =>
                     setSortBy(
-                      sortBy.type === "name"
-                        ? { type: "name", inverted: !sortBy.inverted }
-                        : { type: "name", inverted: false }
+                      sortBy.type === 'name'
+                        ? { type: 'name', inverted: !sortBy.inverted }
+                        : { type: 'name', inverted: false }
                     )
                   }
                 />
               </Flex>
             </Th>
-            {segments.map((segment) => (
-              <Th key={"segment-" + segment.id}>
+            {segments.map(segment => (
+              <Th key={'segment-' + segment.id}>
                 <Flex justifyContent="space-between" alignItems="center">
-                  <Link href={`http://www.strava.com/segments/${segment.id}`}>
-                    {segment.name}
-                  </Link>
+                  <Link href={`http://www.strava.com/segments/${segment.id}`}>{segment.name}</Link>
 
                   <IconButton
                     aria-label="sort"
@@ -257,15 +220,14 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
                     icon={getSegmentIcon(sortBy, segment.id)}
                     onClick={() =>
                       setSortBy(
-                        sortBy.type === "segment" &&
-                          sortBy.segmentId === segment.id
+                        sortBy.type === 'segment' && sortBy.segmentId === segment.id
                           ? {
-                              type: "segment",
+                              type: 'segment',
                               inverted: !sortBy.inverted,
                               segmentId: segment.id,
                             }
                           : {
-                              type: "segment",
+                              type: 'segment',
                               inverted: false,
                               segmentId: segment.id,
                             }
@@ -278,52 +240,37 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {sortedLeaderboard.map((athlete) => (
+          {sortedLeaderboard.map(athlete => (
             <Tr key={athlete.profile}>
-              <Td
-                color={
-                  athlete.rank <= 3
-                    ? `${medalColors[athlete.rank - 1]}.${colorStrength}`
-                    : undefined
-                }
-              >
+              <Td color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}>
                 {athlete.rank}
               </Td>
               <Td>{athlete.totalPoints}</Td>
               <Td>
                 <Link href={`http://www.strava.com${athlete.profile}`}>
                   <Tooltip label={athlete.name} placement="left">
-                    {athlete.name.split(" ")[0]}
+                    {athlete.name.split(' ')[0]}
                   </Tooltip>
                 </Link>
               </Td>
               {segments.map((segment, i) => {
                 const segmentEffort = athlete.efforts[segment.id];
-                const segmentRank = segmentEffort
-                  ? segmentEffort.effort.localRank
-                  : null;
+                const segmentRank = segmentEffort ? segmentEffort.effort.localRank : null;
                 return segmentEffort ? (
                   <Td
-                    key={athlete.profile + "-seg-" + i}
+                    key={athlete.profile + '-seg-' + i}
                     color={
-                      segmentRank && segmentRank <= 3
-                        ? `${medalColors[segmentRank - 1]}.${colorStrength}`
-                        : undefined
+                      segmentRank && segmentRank <= 3 ? `${medalColors[segmentRank - 1]}.${colorStrength}` : undefined
                     }
                   >
-                    <Link
-                      href={`http://strava.com${segmentEffort.effort.effort}`}
-                    >
-                      <Tooltip
-                        label={EffortTooltip(segmentEffort)}
-                        placement="left"
-                      >
+                    <Link href={`http://strava.com${segmentEffort.effort.effort}`}>
+                      <Tooltip label={EffortTooltip(segmentEffort)} placement="left">
                         {segmentEffort.effort.duration}
                       </Tooltip>
                     </Link>
                   </Td>
                 ) : (
-                  <Td key={athlete.profile + "-seg-" + i}>-</Td>
+                  <Td key={athlete.profile + '-seg-' + i}>-</Td>
                 );
               })}
             </Tr>

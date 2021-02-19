@@ -1,6 +1,6 @@
-import { Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
-import * as React from "react";
-import { Link } from "react-router-dom";
+import { Box, Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 interface NavBarItemProps {
   path: string;
@@ -9,8 +9,8 @@ interface NavBarItemProps {
 }
 const NavBarItem = ({ path, activePath, title }: NavBarItemProps) => {
   const isActive = activePath === path;
-  const nonActiveColor = useColorModeValue("darkgray", "gray");
-  const activeColor = "#fc5200";
+  const nonActiveColor = useColorModeValue('darkgray', 'gray');
+  const activeColor = '#fc5200';
   const color = isActive ? activeColor : nonActiveColor;
 
   return (
@@ -29,11 +29,7 @@ interface NavBarProps {
 }
 export const NavBar = ({ activePath }: NavBarProps) => (
   <Flex paddingBottom="5">
-    <NavBarItem
-      path="/invitationals"
-      activePath={activePath}
-      title="Invitationals"
-    />
+    <NavBarItem path="/invitationals" activePath={activePath} title="Invitationals" />
     <NavBarItem path="/segments" activePath={activePath} title="Segments" />
   </Flex>
 );

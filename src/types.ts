@@ -20,7 +20,7 @@ export interface InvitationalEffort {
 export interface Segment {
   name: string;
   id: string;
-  type: "run" | "ride";
+  type: 'run' | 'ride';
 }
 
 export interface Invitational {
@@ -28,7 +28,7 @@ export interface Invitational {
   id: string;
   description: string;
   segment: string;
-  type: "minor" | "major";
+  type: 'minor' | 'major';
   year: number;
 }
 

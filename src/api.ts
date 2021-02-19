@@ -1,12 +1,12 @@
-import { ClubEfforts } from "./types";
+import { ClubEfforts } from './types';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
 const get = async <T>(url: string): Promise<T> => {
   const response = await fetch(url, {
     headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
   });
 

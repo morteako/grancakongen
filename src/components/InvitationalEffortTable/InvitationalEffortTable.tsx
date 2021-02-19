@@ -1,28 +1,14 @@
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Flex,
-  IconButton,
-  Link,
-  Select,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
+import { Box, Flex, IconButton, Link, Select, Table, Tbody, Td, Text, Th, Thead, Tooltip, Tr } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   InvitationalAthlete,
   InvitationalEffort,
   Invitational,
   ClubEfforts,
   LeaderboardInvitationalEffort,
-} from "../../types";
+} from '../../types';
 
 interface Props {
   clubEfforts: ClubEfforts;
@@ -30,29 +16,26 @@ interface Props {
 
 type SortBy =
   | {
-      type: "rank";
+      type: 'rank';
       inverted: boolean;
     }
   | {
-      type: "name";
+      type: 'name';
       inverted: boolean;
     }
   | {
-      type: "invitational";
+      type: 'invitational';
       inverted: boolean;
       invitationalId: string;
     };
 
-const sortLeaderboard = (
-  leaderboard: InvitationalAthlete[],
-  sortBy: SortBy
-) => {
+const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => {
   switch (sortBy.type) {
-    case "name":
+    case 'name':
       return leaderboard.sort((a, b) => a.name.localeCompare(b.name));
-    case "rank":
+    case 'rank':
       return leaderboard.sort((a, b) => a.rank - b.rank);
-    case "invitational":
+    case 'invitational':
       return leaderboard.sort((a, b) => {
         const aEffort = a.efforts[sortBy.invitationalId];
         const bEffort = b.efforts[sortBy.invitationalId];
@@ -70,16 +53,8 @@ const sortLeaderboard = (
   }
 };
 
-const getIcon = (sortBy: SortBy, type: "rank" | "name") =>
-  sortBy.type === type ? (
-    sortBy.inverted ? (
-      <ArrowUpIcon />
-    ) : (
-      <ArrowDownIcon />
-    )
-  ) : (
-    <ArrowUpDownIcon />
-  );
+const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
+  sortBy.type === type ? sortBy.inverted ? <ArrowUpIcon /> : <ArrowDownIcon /> : <ArrowUpDownIcon />;
 
 const EffortTooltip = (effort: LeaderboardInvitationalEffort) => {
   return (
@@ -90,7 +65,7 @@ const EffortTooltip = (effort: LeaderboardInvitationalEffort) => {
   );
 };
 const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
-  sortBy.type === "invitational" && sortBy.invitationalId === invitationalId ? (
+  sortBy.type === 'invitational' && sortBy.invitationalId === invitationalId ? (
     sortBy.inverted ? (
       <ArrowUpIcon />
     ) : (
@@ -101,23 +76,20 @@ const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
   );
 
 const correctDuration = (duration: string) => {
-  if (duration.includes("s")) {
-    const seconds = parseInt(duration.replace("s", ""));
-    return "0:" + (seconds < 10 ? "0" + seconds : seconds);
+  if (duration.includes('s')) {
+    const seconds = parseInt(duration.replace('s', ''));
+    return '0:' + (seconds < 10 ? '0' + seconds : seconds);
   } else {
     return duration;
   }
 };
 
 const getEffortRankMap = (efforts: InvitationalEffort[]) => {
-  const times = efforts.map((e) => {
+  const times = efforts.map(e => {
     return correctDuration(e.duration);
   });
 
-  return times.reduce(
-    (map, time, i) => (map[time] ? map : { ...map, [time]: i }),
-    {} as { [time: string]: number }
-  );
+  return times.reduce((map, time, i) => (map[time] ? map : { ...map, [time]: i }), {} as { [time: string]: number });
 };
 
 const calculateScore = (efforts: LeaderboardInvitationalEffort[]) =>
@@ -126,13 +98,11 @@ const calculateScore = (efforts: LeaderboardInvitationalEffort[]) =>
 const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
   const athletes: { [profile: string]: InvitationalAthlete } = {};
 
-  const filteredEfforts = efforts.invitationalEfforts.filter(
-    (effort) => effort.invitational.year === year
-  );
+  const filteredEfforts = efforts.invitationalEfforts.filter(effort => effort.invitational.year === year);
   // Set/count athletes
 
-  filteredEfforts.map((invitationalEffort) => {
-    return invitationalEffort.efforts.map((effort) => {
+  filteredEfforts.map(invitationalEffort => {
+    return invitationalEffort.efforts.map(effort => {
       athletes[effort.profile] = {
         name: effort.name,
         profile: effort.profile,
@@ -146,14 +116,12 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
 
   const numAthletes = Object.entries(athletes).length;
 
-  filteredEfforts.map((invitationalEffort) => {
+  filteredEfforts.map(invitationalEffort => {
     const effortRankMap = getEffortRankMap(invitationalEffort.efforts);
 
-    return invitationalEffort.efforts.map((effort) => {
+    return invitationalEffort.efforts.map(effort => {
       const rank = effortRankMap[correctDuration(effort.duration)];
-      return (athletes[effort.profile].efforts[
-        invitationalEffort.invitational.id
-      ] = {
+      return (athletes[effort.profile].efforts[invitationalEffort.invitational.id] = {
         points: numAthletes - rank,
         effort: { ...effort, localRank: rank + 1 },
       });
@@ -162,7 +130,7 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
 
   // Reversed
   const leaderboard = Object.values(athletes)
-    .map((athlete) => ({
+    .map(athlete => ({
       ...athlete,
       totalPoints: calculateScore(Object.values(athlete.efforts)),
     }))
@@ -182,12 +150,8 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
   return leaderboard;
 };
 export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
-  const [leaderboard, setLeaderboard] = React.useState(
-    [] as InvitationalAthlete[]
-  );
-  const [invitationals, setInvitationals] = React.useState(
-    [] as Invitational[]
-  );
+  const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
+  const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
   const [year, setYear] = useState(2020);
 
@@ -197,28 +161,28 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
       setLeaderboard(leaderboard);
 
       const invitationals = clubEfforts.invitationalEfforts
-        .filter((effort) => effort.invitational.year === year)
-        .map((effort) => effort.invitational);
+        .filter(effort => effort.invitational.year === year)
+        .map(effort => effort.invitational);
       setInvitationals(invitationals);
     }
   }, [clubEfforts, year]);
 
   const history = useHistory();
 
-  const [sortBy, setSortBy] = useState({ type: "rank" } as SortBy);
+  const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
 
   const sortedLeaderboard = sortBy.inverted
     ? sortLeaderboard(leaderboard, sortBy).reverse()
     : sortLeaderboard(leaderboard, sortBy);
 
   const colorStrength = 400;
-  const medalColors = ["yellow", "gray", "orange"];
+  const medalColors = ['yellow', 'gray', 'orange'];
 
   return (
     <Flex flexDir="column" alignItems="center">
-      <Box width={["100%", "40%", "20%"]}>
+      <Box width={['100%', '40%', '20%']}>
         <Select
-          onChange={(e) => {
+          onChange={e => {
             history.push({ search: `filter=year&year=${e.target.value}` });
             setYear(parseInt(e.target.value));
           }}
@@ -237,12 +201,12 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
                 <IconButton
                   aria-label="sort"
                   size="xs"
-                  icon={getIcon(sortBy, "rank")}
+                  icon={getIcon(sortBy, 'rank')}
                   onClick={() =>
                     setSortBy(
-                      sortBy.type === "rank"
-                        ? { type: "rank", inverted: !sortBy.inverted }
-                        : { type: "rank", inverted: false }
+                      sortBy.type === 'rank'
+                        ? { type: 'rank', inverted: !sortBy.inverted }
+                        : { type: 'rank', inverted: false }
                     )
                   }
                 />
@@ -255,27 +219,23 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
                 <IconButton
                   aria-label="sort"
                   size="xs"
-                  icon={getIcon(sortBy, "name")}
+                  icon={getIcon(sortBy, 'name')}
                   onClick={() =>
                     setSortBy(
-                      sortBy.type === "name"
-                        ? { type: "name", inverted: !sortBy.inverted }
-                        : { type: "name", inverted: false }
+                      sortBy.type === 'name'
+                        ? { type: 'name', inverted: !sortBy.inverted }
+                        : { type: 'name', inverted: false }
                     )
                   }
                 />
               </Flex>
             </Th>
-            {invitationals.map((invitational) => (
-              <Th key={"invitational-" + invitational.id}>
+            {invitationals.map(invitational => (
+              <Th key={'invitational-' + invitational.id}>
                 <Flex justifyContent="space-between" alignItems="center">
                   <Tooltip label={invitational.description} placement="bottom">
                     {invitational.segment ? (
-                      <Link
-                        href={`http://www.strava.com${invitational.segment}`}
-                      >
-                        {invitational.name}
-                      </Link>
+                      <Link href={`http://www.strava.com${invitational.segment}`}>{invitational.name}</Link>
                     ) : (
                       invitational.name
                     )}
@@ -287,15 +247,14 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
                     icon={getInvitationalIcon(sortBy, invitational.id)}
                     onClick={() =>
                       setSortBy(
-                        sortBy.type === "invitational" &&
-                          sortBy.invitationalId === invitational.id
+                        sortBy.type === 'invitational' && sortBy.invitationalId === invitational.id
                           ? {
-                              type: "invitational",
+                              type: 'invitational',
                               inverted: !sortBy.inverted,
                               invitationalId: invitational.id,
                             }
                           : {
-                              type: "invitational",
+                              type: 'invitational',
                               inverted: false,
                               invitationalId: invitational.id,
                             }
@@ -308,63 +267,45 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {sortedLeaderboard.map((athlete) => (
+          {sortedLeaderboard.map(athlete => (
             <Tr key={athlete.profile}>
-              <Td
-                color={
-                  athlete.rank <= 3
-                    ? `${medalColors[athlete.rank - 1]}.${colorStrength}`
-                    : undefined
-                }
-              >
+              <Td color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}>
                 {athlete.rank}
               </Td>
               <Td>{athlete.totalPoints}</Td>
               <Td>
                 <Link href={`http://www.strava.com${athlete.profile}`}>
                   <Tooltip label={athlete.name} placement="left">
-                    {athlete.name.split(" ")[0]}
+                    {athlete.name.split(' ')[0]}
                   </Tooltip>
                 </Link>
               </Td>
               {invitationals.map((invitational, i) => {
                 const invitationalEffort = athlete.efforts[invitational.id];
-                const invitationalRank = invitationalEffort
-                  ? invitationalEffort.effort.localRank
-                  : null;
+                const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
                 return invitationalEffort ? (
                   <Td
-                    key={athlete.profile + "-seg-" + i}
+                    key={athlete.profile + '-seg-' + i}
                     color={
                       invitationalRank && invitationalRank <= 3
-                        ? `${
-                            medalColors[invitationalRank - 1]
-                          }.${colorStrength}`
+                        ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
                         : undefined
                     }
                   >
                     {invitationalEffort.effort.activity ? (
-                      <Link
-                        href={`http://strava.com${invitationalEffort.effort.activity}`}
-                      >
-                        <Tooltip
-                          label={EffortTooltip(invitationalEffort)}
-                          placement="left"
-                        >
+                      <Link href={`http://strava.com${invitationalEffort.effort.activity}`}>
+                        <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
                           {invitationalEffort.effort.duration}
                         </Tooltip>
                       </Link>
                     ) : (
-                      <Tooltip
-                        label={EffortTooltip(invitationalEffort)}
-                        placement="left"
-                      >
+                      <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
                         {invitationalEffort.effort.duration}
                       </Tooltip>
                     )}
                   </Td>
                 ) : (
-                  <Td key={athlete.profile + "-seg-" + i}>-</Td>
+                  <Td key={athlete.profile + '-seg-' + i}>-</Td>
                 );
               })}
             </Tr>

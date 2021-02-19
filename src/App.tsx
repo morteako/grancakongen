@@ -1,15 +1,15 @@
-import * as React from "react";
-import * as api from "./api";
-import { ChakraProvider, Text, Box, Grid, extendTheme } from "@chakra-ui/react";
-import { ColorModeSwitcher } from "./ColorModeSwitcher";
-import { SegmentEffortTable } from "./components/SegmentEffortTable/SegmentEffortTable";
-import { InvitationalEffortTable } from "./components/InvitationalEffortTable/InvitationalEffortTable";
-import useSWR from "swr";
-import { Logo } from "./Logo";
-import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
-import { NavBar } from "./components/NavBar/NavBar";
+import * as React from 'react';
+import * as api from './api';
+import { ChakraProvider, Text, Box, Grid, extendTheme } from '@chakra-ui/react';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
+import { SegmentEffortTable } from './components/SegmentEffortTable/SegmentEffortTable';
+import { InvitationalEffortTable } from './components/InvitationalEffortTable/InvitationalEffortTable';
+import useSWR from 'swr';
+import { Logo } from './Logo';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { NavBar } from './components/NavBar/NavBar';
 
-const clubLinkName = "invitationals";
+const clubLinkName = 'invitationals';
 
 const theme = extendTheme({
   config: {
@@ -17,21 +17,21 @@ const theme = extendTheme({
   },
   colors: {
     strava: {
-      100: "#fc5200",
-      200: "#fc5200",
-      300: "#fc5200",
-      400: "#fc5200",
-      500: "#fc5200",
-      600: "#fc5200",
-      700: "#fc5200",
-      800: "#fc5200",
-      900: "#fc5200",
+      100: '#fc5200',
+      200: '#fc5200',
+      300: '#fc5200',
+      400: '#fc5200',
+      500: '#fc5200',
+      600: '#fc5200',
+      700: '#fc5200',
+      800: '#fc5200',
+      900: '#fc5200',
     },
   },
 });
 
 export const App = () => {
-  const { data } = useSWR("efforts", () => api.fetchEfforts(clubLinkName));
+  const { data } = useSWR('efforts', () => api.fetchEfforts(clubLinkName));
 
   return (
     <ChakraProvider theme={theme}>
@@ -44,11 +44,7 @@ export const App = () => {
         {data ? (
           <BrowserRouter>
             <Switch>
-              <Route
-                exact
-                path="/"
-                render={() => <Redirect to="/invitationals" />}
-              />
+              <Route exact path="/" render={() => <Redirect to="/invitationals" />} />
               <Route path="/invitationals">
                 <NavBar activePath="/invitationals" />
                 <InvitationalEffortTable clubEfforts={data} />
