@@ -19,12 +19,16 @@ export interface InvitationalEffort {
 
 export interface Segment {
   name: string;
+  shortName: string;
+  initials: string;
   id: string;
   type: 'run' | 'ride';
 }
 
 export interface Invitational {
   name: string;
+  shortName: string;
+  initials: string;
   id: string;
   description: string;
   segment: string;

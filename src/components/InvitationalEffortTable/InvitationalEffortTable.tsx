@@ -1,5 +1,20 @@
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
-import { Box, Flex, IconButton, Link, Select, Table, Tbody, Td, Text, Th, Thead, Tooltip, Tr } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  IconButton,
+  Link,
+  Select,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -175,6 +190,8 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
+  const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
+
   const [year, setYear] = useState(2020);
 
   React.useEffect(() => {
@@ -201,139 +218,159 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
   const medalColors = ['yellow', 'gray', 'orange'];
 
   return (
-    <Flex flexDir="column" alignItems="center">
-      <Box width={['100%', '40%', '20%']}>
-        <Select
-          onChange={e => {
-            history.push({ search: `filter=year&year=${e.target.value}` });
-            setYear(parseInt(e.target.value));
-          }}
-          value={year}
-        >
-          <option value="2021">2021</option>
-          <option value="2020">2020</option>
-        </Select>
-      </Box>
-      <Table>
-        <Thead>
-          <Tr>
-            <Th>
-              <Flex justifyContent="space-between" alignItems="center">
-                Rank
-                <IconButton
-                  aria-label="sort"
-                  size="xs"
-                  icon={getIcon(sortBy, 'rank')}
-                  onClick={() =>
-                    setSortBy(
-                      sortBy.type === 'rank'
-                        ? { type: 'rank', inverted: !sortBy.inverted }
-                        : { type: 'rank', inverted: false }
-                    )
-                  }
-                />
-              </Flex>
-            </Th>
-            <Th>Points</Th>
-            <Th>
-              <Flex justifyContent="space-between" alignItems="center">
-                Name
-                <IconButton
-                  aria-label="sort"
-                  size="xs"
-                  icon={getIcon(sortBy, 'name')}
-                  onClick={() =>
-                    setSortBy(
-                      sortBy.type === 'name'
-                        ? { type: 'name', inverted: !sortBy.inverted }
-                        : { type: 'name', inverted: false }
-                    )
-                  }
-                />
-              </Flex>
-            </Th>
-            {invitationals.map(invitational => (
-              <Th key={'invitational-' + invitational.id}>
+    <Flex flexDir="column">
+      <Flex justifyContent="center">
+        <Box width={['100%', '40%', '20%']}>
+          <Select
+            onChange={e => {
+              history.push({ search: `filter=year&year=${e.target.value}` });
+              setYear(parseInt(e.target.value));
+            }}
+            value={year}
+          >
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+          </Select>
+        </Box>
+      </Flex>
+      <Box width="100%" overflow="auto">
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>
                 <Flex justifyContent="space-between" alignItems="center">
-                  <Tooltip label={invitational.description} placement="bottom">
-                    {invitational.segment ? (
-                      <Link href={`http://www.strava.com${invitational.segment}`}>{invitational.name}</Link>
-                    ) : (
-                      invitational.name
-                    )}
-                  </Tooltip>
-
+                  {titleType === 'full' ? 'Rank | Points' : '#|pts'}
                   <IconButton
                     aria-label="sort"
                     size="xs"
-                    icon={getInvitationalIcon(sortBy, invitational.id)}
+                    icon={getIcon(sortBy, 'rank')}
                     onClick={() =>
                       setSortBy(
-                        sortBy.type === 'invitational' && sortBy.invitationalId === invitational.id
-                          ? {
-                              type: 'invitational',
-                              inverted: !sortBy.inverted,
-                              invitationalId: invitational.id,
-                            }
-                          : {
-                              type: 'invitational',
-                              inverted: false,
-                              invitationalId: invitational.id,
-                            }
+                        sortBy.type === 'rank'
+                          ? { type: 'rank', inverted: !sortBy.inverted }
+                          : { type: 'rank', inverted: false }
                       )
                     }
                   />
                 </Flex>
               </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sortedLeaderboard.map(athlete => (
-            <Tr key={athlete.profile}>
-              <Td color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}>
-                {athlete.rank}
-              </Td>
-              <Td>{athlete.totalPoints}</Td>
-              <Td>
-                <Link href={`http://www.strava.com${athlete.profile}`}>
-                  <Tooltip label={athlete.name} placement="left">
-                    {athlete.name.split(' ')[0]}
-                  </Tooltip>
-                </Link>
-              </Td>
-              {invitationals.map((invitational, i) => {
-                const invitationalEffort = athlete.efforts[invitational.id];
-                const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
-                return invitationalEffort ? (
-                  <Td
-                    key={athlete.profile + '-seg-' + i}
-                    color={
-                      invitationalRank && invitationalRank <= 3
-                        ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
-                        : undefined
+              <Th>
+                <Flex justifyContent="space-between" alignItems="center">
+                  Name
+                  <IconButton
+                    aria-label="sort"
+                    size="xs"
+                    icon={getIcon(sortBy, 'name')}
+                    onClick={() =>
+                      setSortBy(
+                        sortBy.type === 'name'
+                          ? { type: 'name', inverted: !sortBy.inverted }
+                          : { type: 'name', inverted: false }
+                      )
                     }
+                  />
+                </Flex>
+              </Th>
+              {invitationals.map(invitational => (
+                <Th key={'invitational-' + invitational.id}>
+                  <Flex justifyContent="space-between" alignItems="center">
+                    <Tooltip label={invitational.description} placement="bottom">
+                      {invitational.segment ? (
+                        <Link href={`http://www.strava.com${invitational.segment}`}>
+                          {titleType === 'initials'
+                            ? invitational.initials
+                            : titleType === 'short'
+                            ? invitational.shortName
+                            : invitational.name}
+                        </Link>
+                      ) : titleType === 'initials' ? (
+                        invitational.initials
+                      ) : titleType === 'short' ? (
+                        invitational.shortName
+                      ) : (
+                        invitational.name
+                      )}
+                    </Tooltip>
+
+                    <IconButton
+                      aria-label="sort"
+                      size="xs"
+                      icon={getInvitationalIcon(sortBy, invitational.id)}
+                      onClick={() =>
+                        setSortBy(
+                          sortBy.type === 'invitational' && sortBy.invitationalId === invitational.id
+                            ? {
+                                type: 'invitational',
+                                inverted: !sortBy.inverted,
+                                invitationalId: invitational.id,
+                              }
+                            : {
+                                type: 'invitational',
+                                inverted: false,
+                                invitationalId: invitational.id,
+                              }
+                        )
+                      }
+                    />
+                  </Flex>
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {sortedLeaderboard.map(athlete => (
+              <Tr key={athlete.profile}>
+                <Td>
+                  <Flex
+                    justifyContent="space-between"
+                    color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}
                   >
-                    {invitationalEffort.effort.activity ? (
-                      <Link href={`http://strava.com${invitationalEffort.effort.activity}`}>
+                    <Text display="inline" fontWeight="semibold">
+                      {athlete.rank}
+                    </Text>
+                    <Text display="inline">{athlete.totalPoints}</Text>
+                  </Flex>
+                </Td>
+                <Td>
+                  <Link href={`http://www.strava.com${athlete.profile}`}>
+                    <Tooltip label={athlete.name} placement="left">
+                      {athlete.name.split(' ')[0]}
+                    </Tooltip>
+                  </Link>
+                </Td>
+                {invitationals.map((invitational, i) => {
+                  const invitationalEffort = athlete.efforts[invitational.id];
+                  const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
+                  return invitationalEffort ? (
+                    <Td
+                      key={athlete.profile + '-seg-' + i}
+                      color={
+                        invitationalRank && invitationalRank <= 3
+                          ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
+                          : undefined
+                      }
+                    >
+                      {invitationalEffort.effort.activity ? (
+                        <Link href={`http://strava.com${invitationalEffort.effort.activity}`}>
+                          <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
+                            {invitationalEffort.effort.duration}
+                          </Tooltip>
+                        </Link>
+                      ) : (
                         <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
                           {invitationalEffort.effort.duration}
                         </Tooltip>
-                      </Link>
-                    ) : (
-                      <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
-                        {invitationalEffort.effort.duration}
-                      </Tooltip>
-                    )}
-                  </Td>
-                ) : (
-                  <Td key={athlete.profile + '-seg-' + i}>-</Td>
-                );
-              })}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+                      )}
+                    </Td>
+                  ) : (
+                    <Td key={athlete.profile + '-seg-' + i}>-</Td>
+                  );
+                })}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Flex>
   );
 };

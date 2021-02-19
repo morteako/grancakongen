@@ -1,5 +1,19 @@
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
-import { Flex, IconButton, Link, Table, Tbody, Td, Text, Th, Thead, Tooltip, Tr } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  IconButton,
+  Link,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { SegmentAthlete, SegmentEffort, Segment, ClubEfforts, LeaderboardSegmentEffort } from '../../types';
 
@@ -148,6 +162,8 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
   const [leaderboard, setLeaderboard] = React.useState([] as SegmentAthlete[]);
   const [segments, setSegments] = React.useState([] as Segment[]);
 
+  const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
+
   React.useEffect(() => {
     if (clubEfforts) {
       const leaderboard = calculateLeaderboard(clubEfforts, 'run');
@@ -170,113 +186,127 @@ export const SegmentEffortTable = ({ clubEfforts }: Props) => {
   const medalColors = ['yellow', 'gray', 'orange'];
 
   return (
-    <Flex flexDir="column" alignItems="center">
-      <Table>
-        <Thead>
-          <Tr>
-            <Th>
-              <Flex justifyContent="space-between" alignItems="center">
-                Rank
-                <IconButton
-                  aria-label="sort"
-                  size="xs"
-                  icon={getIcon(sortBy, 'rank')}
-                  onClick={() =>
-                    setSortBy(
-                      sortBy.type === 'rank'
-                        ? { type: 'rank', inverted: !sortBy.inverted }
-                        : { type: 'rank', inverted: false }
-                    )
-                  }
-                />
-              </Flex>
-            </Th>
-            <Th>Points</Th>
-            <Th>
-              <Flex justifyContent="space-between" alignItems="center">
-                Name
-                <IconButton
-                  aria-label="sort"
-                  size="xs"
-                  icon={getIcon(sortBy, 'name')}
-                  onClick={() =>
-                    setSortBy(
-                      sortBy.type === 'name'
-                        ? { type: 'name', inverted: !sortBy.inverted }
-                        : { type: 'name', inverted: false }
-                    )
-                  }
-                />
-              </Flex>
-            </Th>
-            {segments.map(segment => (
-              <Th key={'segment-' + segment.id}>
+    <Flex flexDir="column">
+      <Box width="100%" overflow="auto">
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>
                 <Flex justifyContent="space-between" alignItems="center">
-                  <Link href={`http://www.strava.com/segments/${segment.id}`}>{segment.name}</Link>
-
+                  {titleType === 'full' ? 'Rank | Points' : '#|pts'}
                   <IconButton
                     aria-label="sort"
                     size="xs"
-                    icon={getSegmentIcon(sortBy, segment.id)}
+                    icon={getIcon(sortBy, 'rank')}
                     onClick={() =>
                       setSortBy(
-                        sortBy.type === 'segment' && sortBy.segmentId === segment.id
-                          ? {
-                              type: 'segment',
-                              inverted: !sortBy.inverted,
-                              segmentId: segment.id,
-                            }
-                          : {
-                              type: 'segment',
-                              inverted: false,
-                              segmentId: segment.id,
-                            }
+                        sortBy.type === 'rank'
+                          ? { type: 'rank', inverted: !sortBy.inverted }
+                          : { type: 'rank', inverted: false }
                       )
                     }
                   />
                 </Flex>
               </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sortedLeaderboard.map(athlete => (
-            <Tr key={athlete.profile}>
-              <Td color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}>
-                {athlete.rank}
-              </Td>
-              <Td>{athlete.totalPoints}</Td>
-              <Td>
-                <Link href={`http://www.strava.com${athlete.profile}`}>
-                  <Tooltip label={athlete.name} placement="left">
-                    {athlete.name.split(' ')[0]}
-                  </Tooltip>
-                </Link>
-              </Td>
-              {segments.map((segment, i) => {
-                const segmentEffort = athlete.efforts[segment.id];
-                const segmentRank = segmentEffort ? segmentEffort.effort.localRank : null;
-                return segmentEffort ? (
-                  <Td
-                    key={athlete.profile + '-seg-' + i}
-                    color={
-                      segmentRank && segmentRank <= 3 ? `${medalColors[segmentRank - 1]}.${colorStrength}` : undefined
+              <Th>
+                <Flex justifyContent="space-between" alignItems="center">
+                  Name
+                  <IconButton
+                    aria-label="sort"
+                    size="xs"
+                    icon={getIcon(sortBy, 'name')}
+                    onClick={() =>
+                      setSortBy(
+                        sortBy.type === 'name'
+                          ? { type: 'name', inverted: !sortBy.inverted }
+                          : { type: 'name', inverted: false }
+                      )
                     }
-                  >
-                    <Link href={`http://strava.com${segmentEffort.effort.effort}`}>
-                      <Tooltip label={EffortTooltip(segmentEffort)} placement="left">
-                        {segmentEffort.effort.duration}
-                      </Tooltip>
+                  />
+                </Flex>
+              </Th>
+              {segments.map(segment => (
+                <Th key={'segment-' + segment.id}>
+                  <Flex justifyContent="space-between" alignItems="center">
+                    <Link href={`http://www.strava.com/segments/${segment.id}`}>
+                      {titleType === 'initials'
+                        ? segment.initials
+                        : titleType === 'short'
+                        ? segment.shortName
+                        : segment.name}
                     </Link>
-                  </Td>
-                ) : (
-                  <Td key={athlete.profile + '-seg-' + i}>-</Td>
-                );
-              })}
+
+                    <IconButton
+                      aria-label="sort"
+                      size="xs"
+                      icon={getSegmentIcon(sortBy, segment.id)}
+                      onClick={() =>
+                        setSortBy(
+                          sortBy.type === 'segment' && sortBy.segmentId === segment.id
+                            ? {
+                                type: 'segment',
+                                inverted: !sortBy.inverted,
+                                segmentId: segment.id,
+                              }
+                            : {
+                                type: 'segment',
+                                inverted: false,
+                                segmentId: segment.id,
+                              }
+                        )
+                      }
+                    />
+                  </Flex>
+                </Th>
+              ))}
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {sortedLeaderboard.map(athlete => (
+              <Tr key={athlete.profile}>
+                <Td color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}>
+                  <Flex
+                    justifyContent="space-between"
+                    color={athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined}
+                  >
+                    <Text display="inline" fontWeight="semibold">
+                      {athlete.rank}
+                    </Text>
+                    <Text display="inline">{athlete.totalPoints}</Text>
+                  </Flex>
+                </Td>
+                <Td>
+                  <Link href={`http://www.strava.com${athlete.profile}`}>
+                    <Tooltip label={athlete.name} placement="left">
+                      {athlete.name.split(' ')[0]}
+                    </Tooltip>
+                  </Link>
+                </Td>
+                {segments.map((segment, i) => {
+                  const segmentEffort = athlete.efforts[segment.id];
+                  const segmentRank = segmentEffort ? segmentEffort.effort.localRank : null;
+                  return segmentEffort ? (
+                    <Td
+                      key={athlete.profile + '-seg-' + i}
+                      color={
+                        segmentRank && segmentRank <= 3 ? `${medalColors[segmentRank - 1]}.${colorStrength}` : undefined
+                      }
+                    >
+                      <Link href={`http://strava.com${segmentEffort.effort.effort}`}>
+                        <Tooltip label={EffortTooltip(segmentEffort)} placement="left">
+                          {segmentEffort.effort.duration}
+                        </Tooltip>
+                      </Link>
+                    </Td>
+                  ) : (
+                    <Td key={athlete.profile + '-seg-' + i}>-</Td>
+                  );
+                })}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Flex>
   );
 };
