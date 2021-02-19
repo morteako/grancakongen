@@ -95,6 +95,30 @@ const getEffortRankMap = (efforts: InvitationalEffort[]) => {
 const calculateScore = (efforts: LeaderboardInvitationalEffort[]) =>
   efforts.reduce((sum, effort) => sum + effort.points, 0);
 
+const calculateScoreByRank = (rank: number) => {
+  // Zero-indexed rank
+  const maxPoints = 25;
+  const firstDecrement = 5;
+
+  let decrementVal = firstDecrement;
+  let points = maxPoints;
+
+  for (let i = 0; i < rank; i++) {
+    points -= decrementVal;
+
+    if (decrementVal !== 1) {
+      decrementVal--;
+    }
+
+    if (points <= 0) {
+      points = 1;
+      break;
+    }
+  }
+
+  return points;
+};
+
 const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
   const athletes: { [profile: string]: InvitationalAthlete } = {};
 
@@ -114,15 +138,13 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
     });
   });
 
-  const numAthletes = Object.entries(athletes).length;
-
   filteredEfforts.map(invitationalEffort => {
     const effortRankMap = getEffortRankMap(invitationalEffort.efforts);
 
     return invitationalEffort.efforts.map(effort => {
       const rank = effortRankMap[correctDuration(effort.duration)];
       return (athletes[effort.profile].efforts[invitationalEffort.invitational.id] = {
-        points: numAthletes - rank,
+        points: calculateScoreByRank(rank),
         effort: { ...effort, localRank: rank + 1 },
       });
     });
