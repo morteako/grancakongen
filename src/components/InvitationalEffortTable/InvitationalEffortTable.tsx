@@ -192,7 +192,7 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
 
   const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
 
-  const [year, setYear] = useState(2020);
+  const [year, setYear] = useState(2021);
 
   React.useEffect(() => {
     if (clubEfforts) {
