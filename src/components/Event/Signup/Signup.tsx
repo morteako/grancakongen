@@ -1,21 +1,16 @@
 import { SmallAddIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import {
-  Box,
   Button,
   Flex,
   FormControl,
   FormErrorMessage,
   FormHelperText,
   FormLabel,
-  Heading,
-  Icon,
   IconButton,
   Input,
   Radio,
   RadioGroup,
   Stack,
-  Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import * as React from 'react';
 
@@ -166,6 +161,15 @@ const Signup = ({}: Props) => {
                 onClick={() => {
                   setTeamMembers([...teamMembers, { name: '', mail: '' }]);
                 }}
+                // border={'1px solid gray'}
+                // _focus={{
+                //   borderWidth: '2px',
+                //   borderStyle: 'solid',
+                //   borderColor: 'strava.300',
+                //   transition: '100ms',
+                //   transitionDelay: '0',
+                //   //   border: '5px solid red',
+                // }}
               >
                 Legg til medlem
               </Button>

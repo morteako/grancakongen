@@ -9,13 +9,31 @@ import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar';
 import Event from './components/Event/Event';
-import { BG } from './BG';
-
-const clubLinkName = 'invitationals';
+import BackgroundGraphics from './BackgroundGraphics';
 
 const theme = extendTheme({
   config: {
     useSystemColorMode: true,
+  },
+
+  components: {
+    Input: {
+      defaultProps: { focusBorderColor: 'strava.300' },
+    },
+    Button: {
+      baseStyle: {
+        _focus: {
+          boxShadow: '0 0 0 2px #ff9955',
+        },
+      },
+    },
+    Link: {
+      baseStyle: {
+        _focus: {
+          boxShadow: '0 0 0 2px #ff9955',
+        },
+      },
+    },
   },
 
   colors: {
@@ -59,7 +77,7 @@ export const App = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      <BG />
+      <BackgroundGraphics />
 
       <Box textAlign="center" fontSize="xl">
         <Grid templateColumns="1fr 2fr 1fr">
