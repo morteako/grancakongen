@@ -30,9 +30,9 @@ const Schous2021 = () => {
             resultatet som et offisielt resultat med mindre du følger de offisielle reglene.
           </Text>
           <Text paddingLeft="5">
-            Dersom du av en eller annen grunn ikke kan drikke øl, tillater vi deltakelse med annen drikke enn øl.
-            Resultatet vil ikke telle i den offisielle <Link href="/invitationals">Invitational-scoringen</Link>, og
-            resultatet vil ha en merknad.
+            Dersom du av en eller annen grunn ikke kan drikke øl, tillater vi deltakelse med annen drikke. Resultatet
+            vil ikke telle i den offisielle <Link href="/invitationals">Invitational-scoringen</Link>, og resultatet vil
+            ha en merknad.
           </Text>
           <Heading as="h3" size="lg">
             Oppkast
