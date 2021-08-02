@@ -9,6 +9,7 @@ import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar';
 import Event from './components/Event/Event';
+import { BG } from './BG';
 
 const clubLinkName = 'invitationals';
 
@@ -58,6 +59,8 @@ export const App = () => {
 
   return (
     <ChakraProvider theme={theme}>
+      <BG />
+
       <Box textAlign="center" fontSize="xl">
         <Grid templateColumns="1fr 2fr 1fr">
           <Text></Text>
