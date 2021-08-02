@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar';
+import Event from './components/Event/Event';
 
 const clubLinkName = 'invitationals';
 
@@ -31,7 +32,7 @@ const theme = extendTheme({
 });
 
 export const App = () => {
-  const { data } = useSWR('efforts', () => api.fetchEfforts(clubLinkName));
+  const { data } = useSWR('efforts', () => api.fetchEfforts());
 
   return (
     <ChakraProvider theme={theme}>
@@ -52,6 +53,9 @@ export const App = () => {
               <Route path="/segments">
                 <NavBar activePath="/segments" />
                 <SegmentEffortTable clubEfforts={data} />
+              </Route>
+              <Route path="/event/:event">
+                <Event />
               </Route>
             </Switch>
           </BrowserRouter>

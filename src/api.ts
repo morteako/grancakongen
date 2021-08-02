@@ -16,6 +16,6 @@ const get = async <T>(url: string): Promise<T> => {
   throw new Error(response.statusText);
 };
 
-export const fetchEfforts = (clubLinkName: string) => {
-  return get<ClubEfforts>(`${baseUrl}/efforts/${clubLinkName}`);
+export const fetchEfforts = () => {
+  return get<ClubEfforts>(`${baseUrl}/efforts`);
 };
