@@ -95,6 +95,21 @@ const Signup = () => {
 
   const teamMembersAreValid = () => teamMembers.every(({ name, mail }) => name && mail) || false;
 
+  const resetForm = () => {
+    setName('');
+    setNameIsTouched(false);
+    setMail('');
+    setMailIsTouched(false);
+    setTimeEstimate('');
+    setTimeEstimateIsTouched(false);
+    setIsTeam(false);
+    setTeamName('');
+    setTeamNameIsTouched(false);
+    setTeamMembers([]);
+    setTeamMembersAreTouched(false);
+    setDataAgreementAccepted(false);
+  };
+
   const submit = () => {
     const team = isTeam ? { team: { teamName, teamMembers } } : undefined;
 
@@ -102,15 +117,16 @@ const Signup = () => {
 
     api
       .signupBeermile(data)
-      .then(e =>
+      .then(e => {
         toast({
           title: 'Påmelding registrert!',
           description: `Vi gleder oss til å se ${degDere} 11. september! 🍻`,
           status: 'success',
           duration: 9000,
           isClosable: true,
-        })
-      )
+        });
+        resetForm();
+      })
       .catch(e =>
         toast({
           title: 'Noe gikk galt',
@@ -239,7 +255,11 @@ const Signup = () => {
           Jeg godtar at påmeldingsdataen (navn og e-post) lagres frem til og med arrangementet (11. september) og 30
           dager etter det, og at resultat med navn og eventuell stravaprofil publiseres på denne siden.
         </FormLabel>
-        <Switch id="data-storage" onChange={e => setDataAgreementAccepted(e.target.checked)} />
+        <Switch
+          id="data-storage"
+          onChange={e => setDataAgreementAccepted(e.target.checked)}
+          isChecked={dataAgreementAccepted}
+        />
       </FormControl>
       <FormControl>
         <Button
