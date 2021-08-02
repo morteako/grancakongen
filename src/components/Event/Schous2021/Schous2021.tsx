@@ -8,7 +8,7 @@ const Schous2021 = () => {
 
   return (
     <Center>
-      <Stack w={stackWidth} paddingLeft={stackPadding} paddingRight={stackPadding}>
+      <Stack w={stackWidth} paddingLeft={stackPadding} paddingRight={stackPadding} marginBottom="20">
         <Stack textAlign="left">
           <Heading as="h1" size="2xl">
             Schous Invitational 2021
