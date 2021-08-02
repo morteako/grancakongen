@@ -83,6 +83,8 @@ const Signup = ({}: Props) => {
   const [timeEstimate, setTimeEstimate] = React.useState('');
   const [timeEstimateIsTouched, setTimeEstimateIsTouched] = React.useState(false);
   const [isTeam, setIsTeam] = React.useState(false);
+  const [teamName, setTeamName] = React.useState('');
+  const [teamNameIsTouched, setTeamNameIsTouched] = React.useState(false);
   const [teamMembers, setTeamMembers] = React.useState([{ name: '', mail: '' }] as TeamMember[]);
 
   const duDere = isTeam ? 'dere' : 'du';
@@ -126,35 +128,50 @@ const Signup = ({}: Props) => {
       </FormControl>
 
       {isTeam ? (
-        <FormControl>
-          <FormLabel>Lagmedlemmer</FormLabel>
-          {teamMembers.map((member, i) => (
-            <TeamMemberEntry
-              index={i}
-              onChange={(teamMemberEntry: TeamMember) => {
-                const copy = [...teamMembers];
-                copy[i] = teamMemberEntry;
-                setTeamMembers(copy);
+        <>
+          <FormControl isInvalid={teamNameIsTouched && !teamName}>
+            <FormLabel>Lagnavn</FormLabel>
+            <Input
+              placeholder={'Megachuggers'}
+              isRequired
+              value={teamName}
+              onChange={e => {
+                setTeamName(e.target.value);
               }}
-              member={member}
-              remove={() => setTeamMembers([...teamMembers].filter((_m, idx) => idx !== i))}
-              memberCount={teamMembers.length}
+              onBlur={() => setTeamNameIsTouched(true)}
             />
-          ))}
-          {/* <FormErrorMessage>Vi E-posten din for å kunne kontakte deg om det skulle trengs.</FormErrorMessage> */}
-          {teamMembers.length < 3 ? (
-            <Button
-              leftIcon={<SmallAddIcon />}
-              colorScheme="gray"
-              variant="solid"
-              onClick={() => {
-                setTeamMembers([...teamMembers, { name: '', mail: '' }]);
-              }}
-            >
-              Legg til medlem
-            </Button>
-          ) : null}
-        </FormControl>
+            <FormErrorMessage>Dere må gi laget deres et navn!</FormErrorMessage>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Lagmedlemmer</FormLabel>
+            {teamMembers.map((member, i) => (
+              <TeamMemberEntry
+                index={i}
+                onChange={(teamMemberEntry: TeamMember) => {
+                  const copy = [...teamMembers];
+                  copy[i] = teamMemberEntry;
+                  setTeamMembers(copy);
+                }}
+                member={member}
+                remove={() => setTeamMembers([...teamMembers].filter((_m, idx) => idx !== i))}
+                memberCount={teamMembers.length}
+              />
+            ))}
+            {/* <FormErrorMessage>Vi E-posten din for å kunne kontakte deg om det skulle trengs.</FormErrorMessage> */}
+            {teamMembers.length < 3 ? (
+              <Button
+                leftIcon={<SmallAddIcon />}
+                colorScheme="gray"
+                variant="solid"
+                onClick={() => {
+                  setTeamMembers([...teamMembers, { name: '', mail: '' }]);
+                }}
+              >
+                Legg til medlem
+              </Button>
+            ) : null}
+          </FormControl>
+        </>
       ) : null}
       <FormControl isInvalid={timeEstimateIsTouched && !timeEstimate}>
         <FormLabel>Hvor lang tid regner {duDere} med å bruke?</FormLabel>
