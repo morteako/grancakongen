@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as api from './api';
-import { ChakraProvider, Text, Box, Grid, extendTheme, theme as defaultTheme } from '@chakra-ui/react';
+import { ChakraProvider, Text, Box, Grid, extendTheme } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { SegmentEffortTable } from './components/SegmentEffortTable/SegmentEffortTable';
 import { InvitationalEffortTable } from './components/InvitationalEffortTable/InvitationalEffortTable';

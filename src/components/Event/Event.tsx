@@ -1,14 +1,13 @@
-import { Box, Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import { Text } from '@chakra-ui/react';
 import * as React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Schous2021 from './Schous2021/Schous2021';
 
 interface RouteParams {
   event: string;
 }
 
-interface Props {}
-const Event = ({}: Props) => {
+const Event = () => {
   const { event } = useParams<RouteParams>();
   switch (event) {
     case 'schous2021':

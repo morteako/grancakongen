@@ -1,20 +1,8 @@
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  Heading,
-  Link,
-  Stack,
-  Text,
-  useBreakpointValue,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Center, Heading, Link, Stack, Text, useBreakpointValue } from '@chakra-ui/react';
 import * as React from 'react';
 import Signup from '../Signup/Signup';
 
-interface Props {}
-const Schous2021 = ({}: Props) => {
+const Schous2021 = () => {
   const stackWidth = useBreakpointValue({ base: '100%', md: '50%' });
   const stackPadding = useBreakpointValue({ base: '3', md: '0' });
 

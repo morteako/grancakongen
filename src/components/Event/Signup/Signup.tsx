@@ -69,8 +69,7 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount }: TeamM
   );
 };
 
-interface Props {}
-const Signup = ({}: Props) => {
+const Signup = () => {
   const [name, setName] = React.useState('');
   const [nameIsTouched, setNameIsTouched] = React.useState(false);
   const [mail, setMail] = React.useState('');
