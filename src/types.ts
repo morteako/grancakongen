@@ -81,3 +81,10 @@ export interface InvitationalAthlete {
   totalPoints: number;
   rank: number;
 }
+
+export interface BeermileSignup {
+  name: string;
+  mail: string;
+  timeEstimate: string;
+  team?: { teamName: string; teamMembers: { name: string; mail: string }[] };
+}

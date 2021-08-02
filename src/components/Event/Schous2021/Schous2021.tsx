@@ -3,7 +3,7 @@ import * as React from 'react';
 import Signup from '../Signup/Signup';
 
 const Schous2021 = () => {
-  const stackWidth = useBreakpointValue({ base: '100%', md: '50%' });
+  const stackWidth = useBreakpointValue({ base: '100%', md: '75%', xl: '50%' });
   const stackPadding = useBreakpointValue({ base: '3', md: '0' });
 
   return (
@@ -16,7 +16,7 @@ const Schous2021 = () => {
           <Text fontWeight="bold">Lørdag 11. september 2021 kl 15:00</Text>
           <Heading as="h2">Regler</Heading>
           <Text>
-            Beer mile går ut på at man skal løpe en engelsk mil (1609 meter) og drikke fire øl så fort som mulig. En
+            Beermile går ut på at man skal løpe en engelsk mil (1609 meter) og drikke fire øl så fort som mulig. En
             runde består av at man drikker en enhet, for så å løpe 400m; dette skal gjøres fire ganger. Det vil være
             oppført en drikkesone på 9 meter. Ølen skal åpnes og drikkes innenfor denne sonen hver runde. Hjelpemidler
             som sugerør eller kopper er ikke tillatt.
@@ -39,7 +39,8 @@ const Schous2021 = () => {
           </Heading>
           <Text paddingLeft="5">
             Oppkast er et kjent fenomen innen beermile. Vanligvis ville oppkast ført til diskvalifikasjon, men i og med
-            at dette i hovedsak er for moroskyld, fører oppkast kun til en ekstrarunde og en merknad i resultatlisten.
+            at dette i hovedsak er for moroskyld, fører oppkast kun til en ekstrarunde (kun løp) og en merknad i
+            resultatlisten.
           </Text>
           <Heading as="h3" size="lg">
             Deltakelse som lag

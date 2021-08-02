@@ -1,4 +1,4 @@
-import { SmallAddIcon, SmallCloseIcon } from '@chakra-ui/icons';
+import { ArrowUpIcon, SmallAddIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import {
   Button,
   Flex,
@@ -11,8 +11,11 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Switch,
+  useToast,
 } from '@chakra-ui/react';
 import * as React from 'react';
+import * as api from '../../../api';
 
 interface TeamMember {
   name: string;
@@ -25,11 +28,12 @@ interface TeamMemberEntryProps {
   member: TeamMember;
   remove: () => void;
   memberCount: number;
+  onBlur: () => void;
 }
 
 const placeholderNames = ['Ola Nordmann', 'Kari Nordmann', 'Ask Nordmann', 'Embla Nordmann'];
 const getPlaceholderMail = (name: string) => `${name.toLowerCase().replace(' ', '.')}@invitationals.no`;
-const TeamMemberEntry = ({ index, onChange, member, remove, memberCount }: TeamMemberEntryProps) => {
+const TeamMemberEntry = ({ index, onChange, member, remove, memberCount, onBlur }: TeamMemberEntryProps) => {
   const name = placeholderNames[index + 1];
   return (
     <Flex marginBottom="2">
@@ -42,6 +46,7 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount }: TeamM
           //   setName(e.target.value);
           onChange({ ...member, name: e.target.value });
         }}
+        onBlur={() => onBlur()}
       />
       <Input
         marginLeft="1"
@@ -52,6 +57,7 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount }: TeamM
           //   setMail(e.target.value);
           onChange({ ...member, mail: e.target.value });
         }}
+        onBlur={() => onBlur()}
       />
       {memberCount > 1 ? (
         <IconButton
@@ -80,8 +86,42 @@ const Signup = () => {
   const [teamName, setTeamName] = React.useState('');
   const [teamNameIsTouched, setTeamNameIsTouched] = React.useState(false);
   const [teamMembers, setTeamMembers] = React.useState([{ name: '', mail: '' }] as TeamMember[]);
-
+  const [teamMembersAreTouched, setTeamMembersAreTouched] = React.useState(false);
+  const [dataAgreementAccepted, setDataAgreementAccepted] = React.useState(false);
   const duDere = isTeam ? 'dere' : 'du';
+  const degDere = isTeam ? 'dere' : 'deg';
+
+  const toast = useToast();
+
+  const teamMembersAreValid = () => teamMembers.every(({ name, mail }) => name && mail) || false;
+
+  const submit = () => {
+    const team = isTeam ? { team: { teamName, teamMembers } } : undefined;
+
+    const data = { name, mail, timeEstimate, ...team };
+
+    api
+      .signupBeermile(data)
+      .then(e =>
+        toast({
+          title: 'Påmelding registrert!',
+          description: `Vi gleder oss til å se ${degDere} 11. september! 🍻`,
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        })
+      )
+      .catch(e =>
+        toast({
+          title: 'Noe gikk galt',
+          description: `Noe gikk galt under påmeldingen. Prøv igjen senere.`,
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+      );
+  };
+
   return (
     <Stack>
       <FormControl isInvalid={nameIsTouched && !name}>
@@ -95,7 +135,7 @@ const Signup = () => {
           }}
           onBlur={() => setNameIsTouched(true)}
         />
-        <FormErrorMessage>Vi trenger navnet ditt for å vite hvem det er som bestiller.</FormErrorMessage>
+        <FormErrorMessage>Vi trenger navnet ditt.</FormErrorMessage>
       </FormControl>
       <FormControl isInvalid={mailIsTouched && !mail}>
         <FormLabel>E-post</FormLabel>
@@ -108,7 +148,7 @@ const Signup = () => {
           }}
           onBlur={() => setMailIsTouched(true)}
         />
-        <FormErrorMessage>Vi E-posten din for å kunne kontakte deg om det skulle trengs.</FormErrorMessage>
+        <FormErrorMessage>Vi trenger e-posten din for å kunne kontakte deg om det skulle trengs.</FormErrorMessage>
       </FormControl>
       <FormControl>
         <FormLabel>Stiller du alene eller som et lag?</FormLabel>
@@ -134,24 +174,31 @@ const Signup = () => {
               }}
               onBlur={() => setTeamNameIsTouched(true)}
             />
-            <FormErrorMessage>Dere må gi laget deres et navn!</FormErrorMessage>
+            <FormErrorMessage>Dere må gi laget deres et navn.</FormErrorMessage>
           </FormControl>
-          <FormControl>
-            <FormLabel>Lagmedlemmer</FormLabel>
+          <FormControl isInvalid={teamMembersAreTouched && !teamMembersAreValid()}>
+            <FormLabel>Lagkamerater</FormLabel>
             {teamMembers.map((member, i) => (
               <TeamMemberEntry
+                key={i}
                 index={i}
                 onChange={(teamMemberEntry: TeamMember) => {
                   const copy = [...teamMembers];
                   copy[i] = teamMemberEntry;
                   setTeamMembers(copy);
+                  setTeamMembersAreTouched(false);
                 }}
                 member={member}
-                remove={() => setTeamMembers([...teamMembers].filter((_m, idx) => idx !== i))}
+                remove={() => {
+                  setTeamMembers([...teamMembers].filter((_m, idx) => idx !== i));
+                  setTeamMembersAreTouched(false);
+                }}
+                onBlur={() => {
+                  setTeamMembersAreTouched(true);
+                }}
                 memberCount={teamMembers.length}
               />
             ))}
-            {/* <FormErrorMessage>Vi E-posten din for å kunne kontakte deg om det skulle trengs.</FormErrorMessage> */}
             {teamMembers.length < 3 ? (
               <Button
                 leftIcon={<SmallAddIcon />}
@@ -160,19 +207,14 @@ const Signup = () => {
                 onClick={() => {
                   setTeamMembers([...teamMembers, { name: '', mail: '' }]);
                 }}
-                // border={'1px solid gray'}
-                // _focus={{
-                //   borderWidth: '2px',
-                //   borderStyle: 'solid',
-                //   borderColor: 'strava.300',
-                //   transition: '100ms',
-                //   transitionDelay: '0',
-                //   //   border: '5px solid red',
-                // }}
               >
                 Legg til medlem
               </Button>
             ) : null}
+            <FormHelperText>
+              Legg inn lagkameratene dine. Vi anbefaler å være lag av enten 2 eller 4 personer.
+            </FormHelperText>
+            <FormErrorMessage>Vi trenger navn og eposten til alle lagkameratene dine.</FormErrorMessage>
           </FormControl>
         </>
       ) : null}
@@ -191,6 +233,27 @@ const Signup = () => {
         <FormHelperText>
           Her trenger {duDere} bare å komme med et veldig røft estimat sånn at vi kan sette sammen heat.
         </FormHelperText>
+      </FormControl>
+      <FormControl display="flex" alignItems="center">
+        <FormLabel htmlFor="data-storage" mb="0">
+          Jeg godtar at påmeldingsdataen (navn og e-post) lagres frem til og med arrangementet (11. september) og 30
+          dager etter det, og at resultat med navn og eventuell stravaprofil publiseres på denne siden.
+        </FormLabel>
+        <Switch id="data-storage" onChange={e => setDataAgreementAccepted(e.target.checked)} />
+      </FormControl>
+      <FormControl>
+        <Button
+          type="submit"
+          colorScheme="strava"
+          onClick={submit}
+          isDisabled={
+            !(name && mail && timeEstimate && dataAgreementAccepted && ((isTeam && teamMembersAreValid()) || !isTeam))
+          }
+          mt="2"
+          leftIcon={<ArrowUpIcon />}
+        >
+          Send påmelding!
+        </Button>
       </FormControl>
     </Stack>
   );

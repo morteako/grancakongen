@@ -34,6 +34,16 @@ const theme = extendTheme({
         },
       },
     },
+    Radio: {
+      // defaultProps: { focusBorderColor: 'strava.300' },
+
+      baseStyle: {
+        // backgroundColor: 'red',
+        _focus: {
+          boxShadow: '0 0 0 2px #ff9955',
+        },
+      },
+    },
   },
 
   colors: {
@@ -49,8 +59,10 @@ const theme = extendTheme({
     },
     blue: {
       100: '#ffddc6',
-      200: '#ffbb8e',
-      300: '#ff9955',
+      // 200: '#ffbb8e',
+      200: '#ff9955',
+
+      300: '#ff8839',
       400: '#ff8839',
       500: '#ff771c',
       600: '#ff6600',
@@ -60,8 +72,10 @@ const theme = extendTheme({
     },
     strava: {
       100: '#ffddc6',
-      200: '#ffbb8e',
-      300: '#ff9955',
+      // 200: '#ffbb8e',
+      200: '#ff9955',
+
+      300: '#ff8839',
       400: '#ff8839',
       500: '#ff771c',
       600: '#ff6600',
