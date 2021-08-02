@@ -8,8 +8,8 @@ import useSWR from 'swr';
 import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar';
-import Event from './components/Event/Event';
 import BackgroundGraphics from './BackgroundGraphics';
+import Schous2021 from './components/Event/Schous2021/Schous2021';
 
 const theme = extendTheme({
   config: {
@@ -111,8 +111,8 @@ export const App = () => {
                 <NavBar activePath="/segments" />
                 <SegmentEffortTable clubEfforts={data} />
               </Route>
-              <Route path="/event/:event">
-                <Event />
+              <Route path="/schous2021">
+                <Schous2021 />
               </Route>
             </Switch>
           </BrowserRouter>
