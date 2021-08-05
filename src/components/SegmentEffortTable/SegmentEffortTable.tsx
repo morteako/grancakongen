@@ -15,11 +15,8 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
+import useEfforts from '../../hooks/efforts';
 import { SegmentAthlete, SegmentEffort, Segment, ClubEfforts, LeaderboardSegmentEffort } from '../../types';
-
-interface Props {
-  clubEfforts: ClubEfforts;
-}
 
 type SortBy =
   | {
@@ -158,23 +155,22 @@ const calculateLeaderboard = (efforts: ClubEfforts, activityType: 'run' | 'ride'
 
   return leaderboard;
 };
-export const SegmentEffortTable = ({ clubEfforts }: Props) => {
+export const SegmentEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as SegmentAthlete[]);
   const [segments, setSegments] = React.useState([] as Segment[]);
 
   const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
+  const efforts = useEfforts();
 
   React.useEffect(() => {
-    if (clubEfforts) {
-      const leaderboard = calculateLeaderboard(clubEfforts, 'run');
+    if (efforts) {
+      const leaderboard = calculateLeaderboard(efforts, 'run');
       setLeaderboard(leaderboard);
 
-      const segments = clubEfforts.segmentEfforts
-        .map(effort => effort.segment)
-        .filter(segment => segment.type === 'run');
+      const segments = efforts.segmentEfforts.map(effort => effort.segment).filter(segment => segment.type === 'run');
       setSegments(segments);
     }
-  }, [clubEfforts]);
+  }, [efforts]);
 
   const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
 

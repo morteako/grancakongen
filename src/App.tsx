@@ -1,94 +1,18 @@
 import * as React from 'react';
-import * as api from './api';
-import { ChakraProvider, Text, Box, Grid, extendTheme } from '@chakra-ui/react';
+import { ChakraProvider, Text, Box, Grid } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { SegmentEffortTable } from './components/SegmentEffortTable/SegmentEffortTable';
 import { InvitationalEffortTable } from './components/InvitationalEffortTable/InvitationalEffortTable';
-import useSWR from 'swr';
 import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar';
 import BackgroundGraphics from './BackgroundGraphics';
 import Schous2021 from './components/Event/Schous2021/Schous2021';
-
-const theme = extendTheme({
-  config: {
-    useSystemColorMode: true,
-  },
-
-  components: {
-    Input: {
-      defaultProps: { focusBorderColor: 'strava.300' },
-    },
-    Button: {
-      baseStyle: {
-        _focus: {
-          boxShadow: '0 0 0 2px #ff9955',
-        },
-      },
-    },
-    Link: {
-      baseStyle: {
-        _focus: {
-          boxShadow: '0 0 0 2px #ff9955',
-        },
-      },
-    },
-    Radio: {
-      // defaultProps: { focusBorderColor: 'strava.300' },
-
-      baseStyle: {
-        // backgroundColor: 'red',
-        _focus: {
-          boxShadow: '0 0 0 2px #ff9955',
-        },
-      },
-    },
-  },
-
-  colors: {
-    gray: {
-      100: '#fafafa',
-      200: '#eeeeee',
-      300: '#e0e0e0',
-      400: '#bdbdbd',
-      500: '#9e9e9e',
-      700: '#424242',
-      800: '#212121',
-      900: '#101010',
-    },
-    blue: {
-      100: '#ffddc6',
-      // 200: '#ffbb8e',
-      200: '#ff9955',
-
-      300: '#ff8839',
-      400: '#ff8839',
-      500: '#ff771c',
-      600: '#ff6600',
-      700: '#df5900',
-      800: '#be4d00',
-      900: '#9e4000',
-    },
-    strava: {
-      100: '#ffddc6',
-      // 200: '#ffbb8e',
-      200: '#ff9955',
-
-      300: '#ff8839',
-      400: '#ff8839',
-      500: '#ff771c',
-      600: '#ff6600',
-      700: '#df5900',
-      800: '#be4d00',
-      900: '#9e4000',
-    },
-  },
-});
+import theme from './theme';
+import useEfforts from './hooks/efforts';
 
 export const App = () => {
-  const { data } = useSWR('efforts', () => api.fetchEfforts());
-
+  const efforts = useEfforts();
   return (
     <ChakraProvider theme={theme}>
       <BackgroundGraphics />
@@ -99,17 +23,17 @@ export const App = () => {
           <Logo />
           <ColorModeSwitcher justifySelf="flex-end" />
         </Grid>
-        {data ? (
+        {efforts ? (
           <BrowserRouter>
             <Switch>
               <Route exact path="/" render={() => <Redirect to="/invitationals" />} />
               <Route path="/invitationals">
                 <NavBar activePath="/invitationals" />
-                <InvitationalEffortTable clubEfforts={data} />
+                <InvitationalEffortTable />
               </Route>
               <Route path="/segments">
                 <NavBar activePath="/segments" />
-                <SegmentEffortTable clubEfforts={data} />
+                <SegmentEffortTable />
               </Route>
               <Route path="/schous2021">
                 <Schous2021 />

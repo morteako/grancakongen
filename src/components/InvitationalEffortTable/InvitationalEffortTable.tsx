@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import useEfforts from '../../hooks/efforts';
 import {
   InvitationalAthlete,
   InvitationalEffort,
@@ -24,10 +25,6 @@ import {
   ClubEfforts,
   LeaderboardInvitationalEffort,
 } from '../../types';
-
-interface Props {
-  clubEfforts: ClubEfforts;
-}
 
 type SortBy =
   | {
@@ -186,7 +183,7 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
 
   return leaderboard;
 };
-export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
+export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
@@ -194,17 +191,19 @@ export const InvitationalEffortTable = ({ clubEfforts }: Props) => {
 
   const [year, setYear] = useState(2021);
 
+  const efforts = useEfforts();
+
   React.useEffect(() => {
-    if (clubEfforts) {
-      const leaderboard = calculateLeaderboard(clubEfforts, year);
+    if (efforts) {
+      const leaderboard = calculateLeaderboard(efforts, year);
       setLeaderboard(leaderboard);
 
-      const invitationals = clubEfforts.invitationalEfforts
+      const invitationals = efforts.invitationalEfforts
         .filter(effort => effort.invitational.year === year)
         .map(effort => effort.invitational);
       setInvitationals(invitationals);
     }
-  }, [clubEfforts, year]);
+  }, [efforts, year]);
 
   const history = useHistory();
 
