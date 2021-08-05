@@ -7,7 +7,6 @@ import {
   FormHelperText,
   FormLabel,
   IconButton,
-  Input,
   Radio,
   RadioGroup,
   Stack,
@@ -16,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import * as React from 'react';
 import * as api from '../../../api';
+import Input from '../../Input/Input';
 
 interface TeamMember {
   name: string;

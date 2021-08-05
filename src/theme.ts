@@ -7,7 +7,7 @@ const theme = extendTheme({
 
   components: {
     Input: {
-      defaultProps: { focusBorderColor: 'strava.300' },
+      defaultProps: { variant: 'outline', colorScheme: 'strava' },
     },
     Button: {
       baseStyle: {
@@ -21,16 +21,12 @@ const theme = extendTheme({
         _focus: {
           boxShadow: '0 0 0 2px #ff9955',
         },
+        color: 'strava.500',
       },
     },
     Radio: {
-      // defaultProps: { focusBorderColor: 'strava.300' },
-
-      baseStyle: {
-        // backgroundColor: 'red',
-        _focus: {
-          boxShadow: '0 0 0 2px #ff9955',
-        },
+      defaultProps: {
+        colorScheme: 'strava',
       },
     },
   },
