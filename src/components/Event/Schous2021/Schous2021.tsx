@@ -42,8 +42,8 @@ const Schous2021 = () => {
           </Heading>
           <Text pl="5">
             Oppkast er et kjent fenomen innen beer mile. Vanligvis ville oppkast ført til diskvalifikasjon, men i og med
-            at dette i hovedsak er for moroskyld, fører oppkast kun til en ekstrarunde (kun løp) og en merknad i
-            resultatlisten.
+            at dette i hovedsak er for moroskyld, fører oppkast kun til en ekstrarunde (kun løp) for hver runde det
+            kastes opp i, og en merknad i resultatlisten.
           </Text>
           <Heading as="h3" size="md" pl="2">
             Deltakelse som lag
@@ -67,6 +67,10 @@ const Schous2021 = () => {
             vurdering, men vi tar gjerne mot flere forslag!
           </Text>
           <Heading>Påmelding</Heading>
+          <Text>
+            Vi ønsker å sette sammen heat, og vi skal muligens få ordnet noen startnummer. Meld deg på så tidlig som
+            mulig, og si fra om du av en eller annen grunn ikke lenger har mulighet til å stille!
+          </Text>
         </Stack>
         <Signup />
       </Stack>
