@@ -2,7 +2,7 @@ import { extendTheme } from '@chakra-ui/react';
 
 const theme = extendTheme({
   config: {
-    useSystemColorMode: true,
+    initialColorMode: 'dark',
   },
 
   components: {
@@ -21,7 +21,6 @@ const theme = extendTheme({
         _focus: {
           boxShadow: '0 0 0 2px #ff9955',
         },
-        color: 'strava.500',
       },
     },
     Radio: {

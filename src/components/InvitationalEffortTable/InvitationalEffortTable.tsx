@@ -191,7 +191,7 @@ export const InvitationalEffortTable = () => {
 
   const [year, setYear] = useState(2021);
 
-  const efforts = useEfforts();
+  const { efforts } = useEfforts();
 
   React.useEffect(() => {
     if (efforts) {

@@ -38,23 +38,23 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount, onBlur 
   return (
     <Flex marginBottom="2">
       <Input
+        id={index + 'name'}
         marginRight="1"
         placeholder={name}
         isRequired
         value={member.name}
         onChange={e => {
-          //   setName(e.target.value);
           onChange({ ...member, name: e.target.value });
         }}
         onBlur={() => onBlur()}
       />
       <Input
+        id={index + 'email'}
         marginLeft="1"
         placeholder={getPlaceholderMail(name)}
         isRequired
         value={member.mail}
         onChange={e => {
-          //   setMail(e.target.value);
           onChange({ ...member, mail: e.target.value });
         }}
         onBlur={() => onBlur()}
@@ -170,7 +170,7 @@ const Signup = () => {
         <FormLabel>Stiller du alene eller som et lag?</FormLabel>
 
         <RadioGroup onChange={e => (e === 'true' ? setIsTeam(true) : setIsTeam(false))} value={`${isTeam}`}>
-          <Stack direction="row">
+          <Stack direction={{ base: 'column', md: 'row' }}>
             <Radio value="false">Jeg stiller alene</Radio>
             <Radio value="true">Jeg stiller som en del av et lag</Radio>
           </Stack>
@@ -196,7 +196,7 @@ const Signup = () => {
             <FormLabel>Lagkamerater</FormLabel>
             {teamMembers.map((member, i) => (
               <TeamMemberEntry
-                key={i}
+                key={i + placeholderNames[i]}
                 index={i}
                 onChange={(teamMemberEntry: TeamMember) => {
                   const copy = [...teamMembers];

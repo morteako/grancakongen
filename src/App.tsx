@@ -12,7 +12,7 @@ import theme from './theme';
 import useEfforts from './hooks/efforts';
 
 export const App = () => {
-  const efforts = useEfforts();
+  const { efforts } = useEfforts();
   return (
     <ChakraProvider theme={theme}>
       <BackgroundGraphics />
@@ -35,7 +35,7 @@ export const App = () => {
                 <NavBar activePath="/segments" />
                 <SegmentEffortTable />
               </Route>
-              <Route path="/schous2021">
+              <Route path="/beermile">
                 <Schous2021 />
               </Route>
             </Switch>

@@ -160,7 +160,7 @@ export const SegmentEffortTable = () => {
   const [segments, setSegments] = React.useState([] as Segment[]);
 
   const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
-  const efforts = useEfforts();
+  const { efforts } = useEfforts();
 
   React.useEffect(() => {
     if (efforts) {
