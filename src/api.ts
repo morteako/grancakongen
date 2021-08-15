@@ -37,5 +37,5 @@ export const fetchEfforts = () => {
 };
 
 export const signupBeermile = (body: BeermileSignup) => {
-  return post<{}, BeermileSignup>(`${baseUrl}/signup/schous2021`, body);
+  return post<{}, BeermileSignup>(`${baseUrl}/signup/beermile`, body);
 };
