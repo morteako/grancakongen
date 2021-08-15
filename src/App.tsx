@@ -10,6 +10,7 @@ import BackgroundGraphics from './BackgroundGraphics';
 import Schous2021 from './components/Event/Schous2021/Schous2021';
 import theme from './theme';
 import useEfforts from './hooks/efforts';
+import Admin from './components/Admin/Admin';
 
 export const App = () => {
   const { efforts } = useEfforts();
@@ -37,6 +38,9 @@ export const App = () => {
               </Route>
               <Route path="/beermile">
                 <Schous2021 />
+              </Route>
+              <Route path="/admin">
+                <Admin />
               </Route>
             </Switch>
           </BrowserRouter>
