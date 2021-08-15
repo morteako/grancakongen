@@ -34,7 +34,6 @@ const post = async <T, U>(url: string, body: U): Promise<T> => {
 
 const authPost = async <T, U>(url: string, body: U): Promise<T> => {
   const token = localStorage.getItem('token');
-  console.log('token:', token);
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -80,7 +79,6 @@ export const adminLogin = (body: { username: string; password: string }) => {
 };
 
 export const authenticateToken = () => {
-  console.log('AUTHENTICATE TOKEN');
   return authPost<{}, {}>(`${baseUrl}/authenticate`, {});
 };
 

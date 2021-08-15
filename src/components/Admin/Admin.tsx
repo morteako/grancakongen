@@ -10,14 +10,12 @@ const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   const signIn = () => {
-    console.log('username', username);
-    console.log('password', password);
     api
       .adminLogin({ username, password })
       .then(res => {
-        console.log('RES:', res);
         if (res) {
           localStorage.setItem('token', '' + res);
+          setIsLoggedIn(true);
         }
       })
       .catch(e => setIsError(true));
@@ -28,9 +26,7 @@ const Admin = () => {
       .authenticateToken()
       .then(() => setIsLoggedIn(true))
       .catch(e => setIsLoggedIn(false));
-    console.log('token:', localStorage.getItem('token'));
   }, []);
-  console.log('isLoggedIn:', isLoggedIn);
   return !isLoggedIn ? (
     <Center>
       <Stack>
