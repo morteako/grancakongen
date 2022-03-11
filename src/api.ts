@@ -1,4 +1,4 @@
-import { BeermileSignup, ClubEfforts } from './types';
+import { BeermileSignup, ClubEfforts, Event } from './types';
 
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
@@ -68,6 +68,10 @@ const authGet = async <T>(url: string): Promise<T> => {
 
 export const fetchEfforts = () => {
   return get<ClubEfforts>(`${baseUrl}/efforts`);
+};
+
+export const fetchEvents = () => {
+  return get<Event[]>(`${baseUrl}/events`);
 };
 
 export const signupBeermile = (body: BeermileSignup) => {

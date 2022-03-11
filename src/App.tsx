@@ -11,6 +11,7 @@ import Schous2021 from './components/Event/Schous2021/Schous2021';
 import theme from './theme';
 import useEfforts from './hooks/efforts';
 import Admin from './components/Admin/Admin';
+import Upcoming from './components/Upcoming/Upcoming';
 
 export const App = () => {
   const { efforts } = useEfforts();
@@ -35,6 +36,9 @@ export const App = () => {
               <Route path="/segments">
                 <NavBar activePath="/segments" />
                 <SegmentEffortTable />
+              </Route>
+              <Route path="/upcoming">
+                <Upcoming />
               </Route>
               <Route path="/beermile">
                 <Schous2021 />

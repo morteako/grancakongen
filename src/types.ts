@@ -52,6 +52,13 @@ export interface ClubEfforts {
   }[];
 }
 
+export interface Event {
+  name: string;
+  date: string;
+  description: string;
+  stravaLink?: string;
+}
+
 export interface LeaderboardSegmentEffort {
   points: number;
   effort: SegmentEffort;
