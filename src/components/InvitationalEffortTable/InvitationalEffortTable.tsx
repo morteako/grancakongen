@@ -189,7 +189,7 @@ export const InvitationalEffortTable = () => {
 
   const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
 
-  const [year, setYear] = useState(2021);
+  const [year, setYear] = useState(2022);
 
   const { efforts } = useEfforts();
 
@@ -227,6 +227,7 @@ export const InvitationalEffortTable = () => {
             }}
             value={year}
           >
+            <option value="2022">2022</option>
             <option value="2021">2021</option>
             <option value="2020">2020</option>
           </Select>
