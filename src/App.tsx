@@ -7,7 +7,7 @@ import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar';
 import BackgroundGraphics from './BackgroundGraphics';
-import Schous2021 from './components/Event/Schous2021/Schous2021';
+import Beermile from './components/Event/Beermile/Beermile';
 import theme from './theme';
 import useEfforts from './hooks/efforts';
 import Admin from './components/Admin/Admin';
@@ -41,7 +41,7 @@ export const App = () => {
                 <Upcoming />
               </Route>
               <Route path="/beermile">
-                <Schous2021 />
+                <Beermile />
               </Route>
               <Route path="/admin">
                 <Admin />

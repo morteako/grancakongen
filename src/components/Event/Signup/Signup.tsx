@@ -40,7 +40,7 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount, onBlur 
       <Input
         id={index + 'name'}
         marginRight="1"
-        placeholder={name}
+        placeholder={`F.eks. ${name}`}
         isRequired
         value={member.name}
         onChange={e => {
@@ -51,7 +51,7 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount, onBlur 
       <Input
         id={index + 'email'}
         marginLeft="1"
-        placeholder={getPlaceholderMail(name)}
+        placeholder={`F.eks. ${getPlaceholderMail(name)}`}
         isRequired
         value={member.mail}
         onChange={e => {
@@ -120,7 +120,7 @@ const Signup = () => {
       .then(e => {
         toast({
           title: 'Påmelding registrert!',
-          description: `Vi gleder oss til å se ${degDere} 11. september! 🍻`,
+          description: `Vi gleder oss til å se ${degDere} på lørdag 20. august! 🍻`,
           status: 'success',
           duration: 9000,
           isClosable: true,
@@ -143,7 +143,7 @@ const Signup = () => {
       <FormControl isInvalid={nameIsTouched && !name}>
         <FormLabel>Navn</FormLabel>
         <Input
-          placeholder={placeholderNames[0]}
+          placeholder={`F.eks. ${placeholderNames[0]}`}
           isRequired
           value={name}
           onChange={e => {
@@ -156,7 +156,7 @@ const Signup = () => {
       <FormControl isInvalid={mailIsTouched && !mail}>
         <FormLabel>E-post</FormLabel>
         <Input
-          placeholder={getPlaceholderMail(placeholderNames[0])}
+          placeholder={`F.eks. ${getPlaceholderMail(placeholderNames[0])}`}
           isRequired
           value={mail}
           onChange={e => {
@@ -182,7 +182,7 @@ const Signup = () => {
           <FormControl isInvalid={teamNameIsTouched && !teamName}>
             <FormLabel>Lagnavn</FormLabel>
             <Input
-              placeholder={'Megachuggers'}
+              placeholder={'F.eks. Megachuggers'}
               isRequired
               value={teamName}
               onChange={e => {
@@ -237,7 +237,7 @@ const Signup = () => {
       <FormControl isInvalid={timeEstimateIsTouched && !timeEstimate}>
         <FormLabel>Hvor lang tid regner {duDere} med å bruke?</FormLabel>
         <Input
-          placeholder="ca 10 min"
+          placeholder="F.eks. ca 10 min"
           isRequired
           value={timeEstimate}
           onChange={e => {
@@ -252,8 +252,8 @@ const Signup = () => {
       </FormControl>
       <FormControl display="flex" alignItems="center">
         <FormLabel htmlFor="data-storage" mb="0">
-          Jeg godtar at påmeldingsdataen (navn og e-post) lagres frem til og med arrangementet (11. september) og 30
-          dager etter det, og at resultat med navn og eventuell stravaprofil publiseres på denne siden.
+          Jeg godtar at påmeldingsdataen (navn og e-post) lagres frem til og med arrangementet (20. august) og 30 dager
+          etter det, og at resultat med navn og eventuell stravaprofil publiseres på denne siden.
         </FormLabel>
         <Switch
           id="data-storage"
