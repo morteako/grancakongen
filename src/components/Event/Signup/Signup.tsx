@@ -19,7 +19,6 @@ import Input from '../../Input/Input';
 
 interface TeamMember {
   name: string;
-  mail: string;
 }
 
 interface TeamMemberEntryProps {
@@ -45,17 +44,6 @@ const TeamMemberEntry = ({ index, onChange, member, remove, memberCount, onBlur 
         value={member.name}
         onChange={e => {
           onChange({ ...member, name: e.target.value });
-        }}
-        onBlur={() => onBlur()}
-      />
-      <Input
-        id={index + 'email'}
-        marginLeft="1"
-        placeholder={`F.eks. ${getPlaceholderMail(name)}`}
-        isRequired
-        value={member.mail}
-        onChange={e => {
-          onChange({ ...member, mail: e.target.value });
         }}
         onBlur={() => onBlur()}
       />
@@ -85,7 +73,7 @@ const Signup = () => {
   const [isTeam, setIsTeam] = React.useState(false);
   const [teamName, setTeamName] = React.useState('');
   const [teamNameIsTouched, setTeamNameIsTouched] = React.useState(false);
-  const [teamMembers, setTeamMembers] = React.useState([{ name: '', mail: '' }] as TeamMember[]);
+  const [teamMembers, setTeamMembers] = React.useState([{ name: '' }] as TeamMember[]);
   const [teamMembersAreTouched, setTeamMembersAreTouched] = React.useState(false);
   const [dataAgreementAccepted, setDataAgreementAccepted] = React.useState(false);
   const duDere = isTeam ? 'dere' : 'du';
@@ -93,7 +81,7 @@ const Signup = () => {
 
   const toast = useToast();
 
-  const teamMembersAreValid = () => teamMembers.every(({ name, mail }) => name && mail) || false;
+  const teamMembersAreValid = () => teamMembers.every(({ name }) => name) || false;
 
   const resetForm = () => {
     setName('');
@@ -141,7 +129,7 @@ const Signup = () => {
   return (
     <Stack>
       <FormControl isInvalid={nameIsTouched && !name}>
-        <FormLabel>Navn</FormLabel>
+        <FormLabel mt="2">Navn</FormLabel>
         <Input
           placeholder={`F.eks. ${placeholderNames[0]}`}
           isRequired
@@ -154,7 +142,7 @@ const Signup = () => {
         <FormErrorMessage>Vi trenger navnet ditt.</FormErrorMessage>
       </FormControl>
       <FormControl isInvalid={mailIsTouched && !mail}>
-        <FormLabel>E-post</FormLabel>
+        <FormLabel mt="2">E-post</FormLabel>
         <Input
           placeholder={`F.eks. ${getPlaceholderMail(placeholderNames[0])}`}
           isRequired
@@ -167,7 +155,7 @@ const Signup = () => {
         <FormErrorMessage>Vi trenger e-posten din for å kunne kontakte deg om det skulle trengs.</FormErrorMessage>
       </FormControl>
       <FormControl>
-        <FormLabel>Stiller du alene eller som et lag?</FormLabel>
+        <FormLabel mt="2">Stiller du alene eller som et lag?</FormLabel>
 
         <RadioGroup onChange={e => (e === 'true' ? setIsTeam(true) : setIsTeam(false))} value={`${isTeam}`}>
           <Stack direction={{ base: 'column', md: 'row' }}>
@@ -180,7 +168,7 @@ const Signup = () => {
       {isTeam ? (
         <>
           <FormControl isInvalid={teamNameIsTouched && !teamName}>
-            <FormLabel>Lagnavn</FormLabel>
+            <FormLabel mt="2">Lagnavn</FormLabel>
             <Input
               placeholder={'F.eks. Megachuggers'}
               isRequired
@@ -193,7 +181,7 @@ const Signup = () => {
             <FormErrorMessage>Dere må gi laget deres et navn.</FormErrorMessage>
           </FormControl>
           <FormControl isInvalid={teamMembersAreTouched && !teamMembersAreValid()}>
-            <FormLabel>Lagkamerater</FormLabel>
+            <FormLabel mt="2">Lagkamerater</FormLabel>
             {teamMembers.map((member, i) => (
               <TeamMemberEntry
                 key={i + placeholderNames[i]}
@@ -221,7 +209,8 @@ const Signup = () => {
                 colorScheme="gray"
                 variant="solid"
                 onClick={() => {
-                  setTeamMembers([...teamMembers, { name: '', mail: '' }]);
+                  setTeamMembers([...teamMembers, { name: '' }]);
+                  setTeamMembersAreTouched(false);
                 }}
               >
                 Legg til medlem
@@ -230,12 +219,12 @@ const Signup = () => {
             <FormHelperText>
               Legg inn lagkameratene dine. Vi anbefaler å være lag av enten 2 eller 4 personer.
             </FormHelperText>
-            <FormErrorMessage>Vi trenger navn og eposten til alle lagkameratene dine.</FormErrorMessage>
+            <FormErrorMessage>Vi trenger navnet til alle lagkameratene dine.</FormErrorMessage>
           </FormControl>
         </>
       ) : null}
       <FormControl isInvalid={timeEstimateIsTouched && !timeEstimate}>
-        <FormLabel>Hvor lang tid regner {duDere} med å bruke?</FormLabel>
+        <FormLabel mt="2">Hvor lang tid regner {duDere} med å bruke?</FormLabel>
         <Input
           placeholder="F.eks. ca 10 min"
           isRequired
@@ -251,7 +240,7 @@ const Signup = () => {
         </FormHelperText>
       </FormControl>
       <FormControl display="flex" alignItems="center">
-        <FormLabel htmlFor="data-storage" mb="0">
+        <FormLabel htmlFor="data-storage" mb="0" mt="2">
           Jeg godtar at påmeldingsdataen (navn og e-post) lagres frem til og med arrangementet (20. august) og 30 dager
           etter det, og at resultat med navn og eventuell stravaprofil publiseres på denne siden.
         </FormLabel>

@@ -93,5 +93,5 @@ export interface BeermileSignup {
   name: string;
   mail: string;
   timeEstimate: string;
-  team?: { teamName: string; teamMembers: { name: string; mail: string }[] };
+  team?: { teamName: string; teamMembers: { name: string }[] };
 }
