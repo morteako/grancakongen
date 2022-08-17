@@ -13,9 +13,8 @@ const Beermile = () => {
           <Heading as="h1" size="2xl">
             BEER MILE 2022
           </Heading>
-          <Text fontWeight="bold">
-            Lørdag 20. august 2022 kl 16:00 – Lokasjon publiseres senest på fredag 19. august kl 18
-          </Text>
+          <Text fontWeight="bold">Lørdag 20. august 2022 kl 16:00 – ved Institutt for informatikk (Gaustad)</Text>
+          <Text fontSize={'sm'}>Eventuell endring av lokasjon kommer senest fredag 19. august kl 18</Text>
           <Heading as="h2">Regler</Heading>
           <Text>
             Beer mile går ut på at man skal løpe en engelsk mil (1609 meter) og drikke fire øl så fort som mulig. En
@@ -71,9 +70,10 @@ const Beermile = () => {
           </Text>
           <Heading>Løypekart</Heading>
           <Text>
-            Løypen er ennå ikke avklart, men det vil bli et sted i Oslo som er greit å komme seg til kollektivt. Vi
-            skulle gjerne ha løpt på bane for optimal løype, men vi tviler på at vi klarer å arrangere det på en
-            forsvarlig måte. Vi har alternativer til vurdering, men vi tar gjerne mot flere forslag!
+            Vi løper [mest sannsynlig] ved Institutt for informatikk (Gaustadalléen 23B) – der er det ganske flatt,
+            asfalt og gode publikumsmuligheter. Vi skulle gjerne ha løpt på bane for optimal løype, men vi tviler på at
+            vi klarer å arrangere det på en forsvarlig måte. Vi har alternativer til vurdering, men vi tar gjerne mot
+            flere forslag!
           </Text>
           <Text>Løypekaret vil være tilgjengelig her senest kl 10:00 på løpsdagen.</Text>
           <Heading>Påmelding</Heading>
