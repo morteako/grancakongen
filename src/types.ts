@@ -13,6 +13,14 @@ export interface InvitationalEffort {
   name: string;
   profile: string;
   activity: string;
+  duration: number;
+  localRank?: number;
+}
+
+export interface InvitationalEffortFromApi {
+  name: string;
+  profile: string;
+  activity: string;
   duration: string;
   localRank?: number;
 }
@@ -41,6 +49,15 @@ export interface Club {
   linkName: string;
   id: string;
   segments: Segment[];
+}
+
+export interface ClubEffortsFromApi {
+  club: Club;
+  segmentEfforts: { segment: Segment; efforts: SegmentEffort[] }[];
+  invitationalEfforts: {
+    invitational: Invitational;
+    efforts: InvitationalEffortFromApi[];
+  }[];
 }
 
 export interface ClubEfforts {
