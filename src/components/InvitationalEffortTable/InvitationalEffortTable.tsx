@@ -87,21 +87,10 @@ const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
     <ArrowUpDownIcon />
   );
 
-const correctDuration = (duration: string) => {
-  if (duration.includes('s')) {
-    const seconds = parseInt(duration.replace('s', ''));
-    return '0:' + (seconds < 10 ? '0' + seconds : seconds);
-  } else {
-    return duration;
-  }
-};
-
 const getEffortRankMap = (efforts: InvitationalEffort[]) => {
-  const times = efforts.map(e => {
-    return correctDuration(e.duration);
-  });
+  const times = efforts.map(e => e.duration);
 
-  return times.reduce((map, time, i) => (map[time] ? map : { ...map, [time]: i }), {} as { [time: string]: number });
+  return times.reduce((map, time, i) => (map[time] ? map : { ...map, [time]: i }), {} as { [time: number]: number });
 };
 
 const calculateScore = (efforts: LeaderboardInvitationalEffort[]) =>
@@ -154,7 +143,7 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
     const effortRankMap = getEffortRankMap(invitationalEffort.efforts);
 
     return invitationalEffort.efforts.map(effort => {
-      const rank = effortRankMap[correctDuration(effort.duration)];
+      const rank = effortRankMap[effort.duration];
       return (athletes[effort.profile].efforts[invitationalEffort.invitational.id] = {
         points: calculateScoreByRank(rank),
         effort: { ...effort, localRank: rank + 1 },
@@ -353,12 +342,12 @@ export const InvitationalEffortTable = () => {
                       {invitationalEffort.effort.activity ? (
                         <Link href={`http://strava.com${invitationalEffort.effort.activity}`}>
                           <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
-                            {invitationalEffort.effort.duration}
+                            {getDurationInMMSS(invitationalEffort.effort)}
                           </Tooltip>
                         </Link>
                       ) : (
                         <Tooltip label={EffortTooltip(invitationalEffort)} placement="left">
-                          {invitationalEffort.effort.duration}
+                          {getDurationInMMSS(invitationalEffort.effort)}
                         </Tooltip>
                       )}
                     </Td>
@@ -373,4 +362,11 @@ export const InvitationalEffortTable = () => {
       </Box>
     </Flex>
   );
+};
+
+const getDurationInMMSS = (effort: InvitationalEffort) => {
+  const minutes = Math.floor(effort.duration / 60);
+  const seconds = Math.floor(effort.duration % 60);
+  const secondsPadding = seconds < 10 ? '0' : '';
+  return `${minutes}:${secondsPadding}${seconds}`;
 };
