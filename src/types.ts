@@ -63,11 +63,13 @@ export interface ClubEffortsFromApi {
 export interface ClubEfforts {
   club: Club;
   segmentEfforts: { segment: Segment; efforts: SegmentEffort[] }[];
-  invitationalEfforts: {
-    invitational: Invitational;
-    efforts: InvitationalEffort[];
-  }[];
+  invitationalEfforts: InvitationalEffortGroup[];
 }
+
+export type InvitationalEffortGroup = {
+  invitational: Invitational;
+  efforts: InvitationalEffort[];
+};
 
 export interface Event {
   name: string;

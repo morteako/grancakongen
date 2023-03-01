@@ -24,6 +24,7 @@ import {
   Invitational,
   ClubEfforts,
   LeaderboardInvitationalEffort,
+  InvitationalEffortGroup,
 } from '../../types';
 
 type SortBy =
@@ -88,7 +89,7 @@ const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
   );
 
 const getEffortRankMap = (efforts: InvitationalEffort[]) => {
-  const times = efforts.map(e => e.duration);
+  const times = efforts.map(e => e.duration).sort((a, b) => a - b);
 
   return times.reduce((map, time, i) => (map[time] ? map : { ...map, [time]: i }), {} as { [time: number]: number });
 };
@@ -120,24 +121,45 @@ const calculateScoreByRank = (rank: number) => {
   return points;
 };
 
-const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
-  const athletes: { [profile: string]: InvitationalAthlete } = {};
+const getRelevantInvitationals = (efforts: ClubEfforts, year: number | null) => {
+  return efforts.invitationalEfforts.filter(effort => (year ? effort.invitational.year === year : true));
+};
 
-  const filteredEfforts = efforts.invitationalEfforts.filter(effort => effort.invitational.year === year);
+const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], year: number | null) => {
+  const athletes: { [profile: string]: InvitationalAthlete } = {};
+  let filteredEfforts: InvitationalEffortGroup[];
+  if (year) {
+    filteredEfforts = invitationalEfforts;
+  } else {
+    const bestEfforts = calculateBestEffortsForPersonEvent(invitationalEfforts);
+
+    filteredEfforts = invitationalEfforts.flatMap(event => {
+      const res = bestEfforts.get(event.invitational.name);
+      if (res === undefined) {
+        console.error(`${event.invitational.name} missing. Should not happen.`);
+        return [];
+      }
+      return {
+        invitational: event.invitational,
+        efforts: Array.from(res.values()),
+      };
+    });
+    filteredEfforts = dedupInvitationals(filteredEfforts, x => x.invitational, year);
+  }
   // Set/count athletes
 
-  filteredEfforts.map(invitationalEffort => {
-    return invitationalEffort.efforts.map(effort => {
-      athletes[effort.profile] = {
-        name: effort.name,
-        profile: effort.profile,
-        efforts: {},
-        totalPoints: 0,
-        rank: 0,
-      };
-      return null;
-    });
-  });
+  filteredEfforts.forEach(invitationalEffort =>
+    invitationalEffort.efforts.forEach(
+      effort =>
+        (athletes[effort.profile] = {
+          name: effort.name,
+          profile: effort.profile,
+          efforts: {},
+          totalPoints: 0,
+          rank: 0,
+        })
+    )
+  );
 
   filteredEfforts.map(invitationalEffort => {
     const effortRankMap = getEffortRankMap(invitationalEffort.efforts);
@@ -172,24 +194,66 @@ const calculateLeaderboard = (efforts: ClubEfforts, year: number) => {
 
   return leaderboard;
 };
+
+const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) => {
+  const bestEffort = (a: InvitationalEffort, b: InvitationalEffort) => (a.duration < b.duration ? a : b);
+
+  const bestEffortsForPersonEvent = new Map<string, Map<string, InvitationalEffort>>();
+
+  //populate bestEffortsForPersonEvent
+  efforts.forEach(inviEfforts => {
+    const name = inviEfforts.invitational.name;
+    const bestEffortsForEvent = bestEffortsForPersonEvent.get(name);
+    let eventMap: Map<string, InvitationalEffort>;
+    if (bestEffortsForEvent === undefined) {
+      eventMap = new Map();
+      bestEffortsForPersonEvent.set(name, eventMap);
+    } else {
+      eventMap = bestEffortsForEvent;
+    }
+
+    inviEfforts.efforts.forEach(effort => {
+      const currentPersonBestEffort = eventMap.get(effort.name);
+      if (currentPersonBestEffort === undefined) {
+        eventMap.set(effort.name, effort);
+      } else {
+        eventMap.set(effort.name, bestEffort(effort, currentPersonBestEffort));
+      }
+    });
+  });
+
+  return bestEffortsForPersonEvent;
+};
+
+const dedupInvitationals = <T,>(invitationals: T[], getInv: (x: T) => Invitational, year: number | null) => {
+  if (year) return invitationals;
+  const uniqueInvitationalNames = new Map<string, T>();
+  invitationals.forEach(inv => uniqueInvitationalNames.set(getInv(inv).name, inv));
+  return Array.from(uniqueInvitationalNames.values());
+};
+
 export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
   const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
 
-  const [year, setYear] = useState(2022);
+  const [year, setYear] = useState<number | null>(2022);
 
   const { efforts } = useEfforts();
 
   React.useEffect(() => {
     if (efforts) {
-      const leaderboard = calculateLeaderboard(efforts, year);
+      const relevantInvitationals = getRelevantInvitationals(efforts, year);
+      const leaderboard = calculateLeaderboard(relevantInvitationals, year);
       setLeaderboard(leaderboard);
 
-      const invitationals = efforts.invitationalEfforts
-        .filter(effort => effort.invitational.year === year)
-        .map(effort => effort.invitational);
+      const invitationals = dedupInvitationals(
+        relevantInvitationals.map(effort => effort.invitational),
+        x => x,
+        year
+      );
+
       setInvitationals(invitationals);
     }
   }, [efforts, year]);
@@ -212,13 +276,14 @@ export const InvitationalEffortTable = () => {
           <Select
             onChange={e => {
               history.push({ search: `filter=year&year=${e.target.value}` });
-              setYear(parseInt(e.target.value));
+              setYear(e.target.value === '' ? null : parseInt(e.target.value));
             }}
-            value={year}
+            value={year || ''}
           >
             <option value="2022">2022</option>
             <option value="2021">2021</option>
             <option value="2020">2020</option>
+            <option value="">All-time</option>
           </Select>
         </Box>
       </Flex>
