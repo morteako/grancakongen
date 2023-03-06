@@ -15,6 +15,7 @@ export interface InvitationalEffort {
   activity: string;
   duration: number;
   localRank?: number;
+  year?: number;
 }
 
 export interface InvitationalEffortFromApi {
