@@ -74,6 +74,7 @@ const EffortTooltip = (effort: LeaderboardInvitationalEffort) => {
     <Flex flexDir="column">
       <Text>Rank: {effort.effort.localRank}</Text>
       <Text>Points: {effort.points}</Text>
+      {effort.effort.year === undefined ? <></> : <Text>Year: {effort.effort.year}</Text>}
     </Flex>
   );
 };
@@ -215,9 +216,12 @@ const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) 
     inviEfforts.efforts.forEach(effort => {
       const currentPersonBestEffort = eventMap.get(effort.name);
       if (currentPersonBestEffort === undefined) {
-        eventMap.set(effort.name, effort);
+        eventMap.set(effort.name, { ...effort, year: inviEfforts.invitational.year });
       } else {
-        eventMap.set(effort.name, bestEffort(effort, currentPersonBestEffort));
+        eventMap.set(
+          effort.name,
+          bestEffort({ ...effort, year: inviEfforts.invitational.year }, currentPersonBestEffort)
+        );
       }
     });
   });
