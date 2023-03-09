@@ -1,11 +1,12 @@
+import { useMantineColorScheme } from '@mantine/styles';
 import * as React from 'react';
-import { useColorMode, useColorModeValue, IconButton, IconButtonProps } from '@chakra-ui/react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 
-type ColorModeSwitcherProps = Omit<IconButtonProps, 'aria-label'>;
+// type ColorModeSwitcherProps = Omit<IconButtonProps, 'aria-label'>;
 
 export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = props => {
   const { toggleColorMode } = useColorMode();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const text = useColorModeValue('dark', 'light');
   const SwitchIcon = useColorModeValue(FaMoon, FaSun);
 

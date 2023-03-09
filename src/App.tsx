@@ -1,27 +1,25 @@
 import * as React from 'react';
-import { ChakraProvider, Text, Box, Grid } from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { InvitationalEffortTable } from './components/InvitationalEffortTable/InvitationalEffortTable';
 import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import BackgroundGraphics from './BackgroundGraphics';
-import Beermile from './components/Event/Beermile/Beermile';
-import theme from './theme';
+import { BackgroundGraphics } from './BackgroundGraphics';
+// import Beermile from './components/Event/Beermile/Beermile';
 import useEfforts from './hooks/efforts';
-import Admin from './components/Admin/Admin';
-import Upcoming from './components/Upcoming/Upcoming';
+// import Admin from './components/Admin/Admin';
+// import Upcoming from './components/Upcoming/Upcoming';
+import { Center, Grid, Loader, MantineProvider, Stack } from '@mantine/core';
 
 export const App = () => {
   const { efforts } = useEfforts();
   return (
-    <ChakraProvider theme={theme}>
-      <BackgroundGraphics />
+    <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: 'dark', primaryColor: 'gray' }}>
+      {<BackgroundGraphics />}
 
-      <Box textAlign="center" fontSize="xl">
-        <Grid templateColumns="1fr 2fr 1fr">
-          <Text></Text>
-          <Logo />
-          <ColorModeSwitcher justifySelf="flex-end" />
+      <Stack>
+        <Grid columns={4}>
+          <Grid.Col span={1}></Grid.Col>
+          <Grid.Col span={2}>{<Logo />}</Grid.Col>
+          <Grid.Col span={1}>{/*<ColorModeSwitcher justifySelf="flex-end" />*/}</Grid.Col>
         </Grid>
         {efforts ? (
           <BrowserRouter>
@@ -29,7 +27,7 @@ export const App = () => {
               <Route exact path="/">
                 <InvitationalEffortTable />
               </Route>
-              <Route path="/upcoming">
+              {/*<Route path="/upcoming">
                 <Upcoming />
               </Route>
               <Route path="/beermile">
@@ -37,14 +35,16 @@ export const App = () => {
               </Route>
               <Route path="/admin">
                 <Admin />
-              </Route>
+              </Route>*/}
               <Route path="*" render={() => <Redirect to="/" />} />
             </Switch>
           </BrowserRouter>
         ) : (
-          <Text>Loading..</Text>
+          <Center>
+            <Loader />
+          </Center>
         )}
-      </Box>
-    </ChakraProvider>
+      </Stack>
+    </MantineProvider>
   );
 };
