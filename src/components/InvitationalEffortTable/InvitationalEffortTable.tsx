@@ -11,6 +11,7 @@ import {
   InvitationalEffortGroup,
 } from '../../types';
 import { ActionIcon, Anchor, Box, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { useViewportSize } from '@mantine/hooks';
 
 type SortBy =
   | {
@@ -225,9 +226,9 @@ export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
-  /* TODO: Make this responsive*/
-  // const titleType = useBreakpointValue({ base: 'initials', md: 'short', xl: 'full' });
-  const titleType: 'initials' | 'short' | 'full' = 'short';
+  /* TODO: Improve responsiveness */
+  const { width } = useViewportSize();
+  const titleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
   const [year, setYear] = useState<number | null>(2022);
 

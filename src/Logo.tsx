@@ -17,5 +17,5 @@ export const Logo: React.FC<Props> = props => {
     : props.variant === 'white'
     ? logoWhite
     : themeLogo;
-  return <Image src={logo} {...props} />;
+  return <Image maw="700px" src={logo} {...props} />;
 };
