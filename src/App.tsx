@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { ChakraProvider, Text, Box, Grid } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { SegmentEffortTable } from './components/SegmentEffortTable/SegmentEffortTable';
 import { InvitationalEffortTable } from './components/InvitationalEffortTable/InvitationalEffortTable';
 import { Logo } from './Logo';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import { NavBar } from './components/NavBar/NavBar';
 import BackgroundGraphics from './BackgroundGraphics';
 import Beermile from './components/Event/Beermile/Beermile';
 import theme from './theme';
@@ -28,14 +26,8 @@ export const App = () => {
         {efforts ? (
           <BrowserRouter>
             <Switch>
-              <Route exact path="/" render={() => <Redirect to="/invitationals" />} />
-              <Route path="/invitationals">
-                <NavBar activePath="/invitationals" />
+              <Route exact path="/">
                 <InvitationalEffortTable />
-              </Route>
-              <Route path="/segments">
-                <NavBar activePath="/segments" />
-                <SegmentEffortTable />
               </Route>
               <Route path="/upcoming">
                 <Upcoming />
@@ -46,6 +38,7 @@ export const App = () => {
               <Route path="/admin">
                 <Admin />
               </Route>
+              <Route path="*" render={() => <Redirect to="/" />} />
             </Switch>
           </BrowserRouter>
         ) : (
