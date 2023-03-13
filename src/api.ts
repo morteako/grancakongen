@@ -1,6 +1,6 @@
 import { BeermileSignup, ClubEffortsFromApi, Event } from './types';
 
-const baseUrl = process.env.REACT_APP_BASE_URL;
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const get = async <T>(url: string): Promise<T> => {
   const response = await fetch(url, {
