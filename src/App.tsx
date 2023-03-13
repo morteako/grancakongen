@@ -6,7 +6,6 @@ import { BackgroundGraphics } from './BackgroundGraphics';
 // import Beermile from './components/Event/Beermile/Beermile';
 import useEfforts from './hooks/efforts';
 // import Admin from './components/Admin/Admin';
-// import Upcoming from './components/Upcoming/Upcoming';
 import { Center, Grid, Loader, MantineProvider, Stack } from '@mantine/core';
 
 export const App = () => {
@@ -19,7 +18,7 @@ export const App = () => {
         <Grid columns={4}>
           <Grid.Col span={1}></Grid.Col>
           <Grid.Col span={2}>{<Logo />}</Grid.Col>
-          <Grid.Col span={1}>{/*<ColorModeSwitcher justifySelf="flex-end" />*/}</Grid.Col>
+          <Grid.Col span={1}></Grid.Col>
         </Grid>
         {efforts ? (
           <BrowserRouter>
@@ -35,7 +34,8 @@ export const App = () => {
               </Route>
               <Route path="/admin">
                 <Admin />
-              </Route>*/}
+              </Route>
+              */}
               <Route path="*" render={() => <Redirect to="/" />} />
             </Switch>
           </BrowserRouter>
