@@ -5,7 +5,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { BackgroundGraphics } from './BackgroundGraphics';
 // import Beermile from './components/Event/Beermile/Beermile';
 import useEfforts from './hooks/efforts';
-// import Admin from './components/Admin/Admin';
+import Admin from './components/Admin/Admin';
 import { Center, Grid, Loader, MantineProvider, Stack } from '@mantine/core';
 
 export const App = () => {
@@ -32,10 +32,10 @@ export const App = () => {
               <Route path="/beermile">
                 <Beermile />
               </Route>
+              */}
               <Route path="/admin">
                 <Admin />
               </Route>
-              */}
               <Route path="*" render={() => <Redirect to="/" />} />
             </Switch>
           </BrowserRouter>
