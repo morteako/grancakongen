@@ -1,4 +1,4 @@
-import { Button, Center, Input, Stack, Text } from '@chakra-ui/react';
+import { Button, Center, Stack, TextInput, Text } from '@mantine/core';
 import * as React from 'react';
 import * as api from '../../api';
 import LoggedInAdmin from './LoggedInAdmin';
@@ -30,7 +30,7 @@ const Admin = () => {
   return !isLoggedIn ? (
     <Center>
       <Stack>
-        <Input
+        <TextInput
           placeholder="Username"
           value={username}
           onChange={e => {
@@ -38,7 +38,7 @@ const Admin = () => {
             setIsError(false);
           }}
         />
-        <Input
+        <TextInput
           placeholder="Password"
           type="password"
           value={password}
@@ -52,7 +52,7 @@ const Admin = () => {
             }
           }}
         />
-        <Button isDisabled={!username || !password} onClick={signIn}>
+        <Button disabled={!username || !password} onClick={signIn}>
           Sign in
         </Button>
         {isError ? <Text>Noe gikk galt</Text> : null}

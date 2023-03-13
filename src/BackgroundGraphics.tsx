@@ -1,24 +1,10 @@
+import { Box, Image, ImageProps } from '@mantine/core';
 import * as React from 'react';
-import { chakra, ImageProps, forwardRef, useColorModeValue, useBreakpointValue } from '@chakra-ui/react';
 import bg from './bg.svg';
 
-const BackgroundGraphics = forwardRef<ImageProps, 'img'>((props, ref) => {
-  const opacity = useColorModeValue('0.1', '0.2');
-
-  const size = useBreakpointValue({ base: '200%', lg: '100%' });
+export const BackgroundGraphics: React.FC<ImageProps> = props => {
+  /*TODO: Fix responsiveness – set 100% width for desktop */
   return (
-    <chakra.img
-      minWidth={size}
-      position="absolute"
-      bottom="0"
-      right="0"
-      opacity={opacity}
-      zIndex="-20"
-      src={bg}
-      ref={ref}
-      {...props}
-    />
+    <Image pos="absolute" bottom="0" right="0" opacity={0.2} miw="200%" style={{ zIndex: -20 }} src={bg} {...props} />
   );
-});
-
-export default BackgroundGraphics;
+};
