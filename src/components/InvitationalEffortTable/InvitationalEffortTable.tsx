@@ -224,6 +224,7 @@ const dedupInvitationals = <T,>(invitationals: T[], getInv: (x: T) => Invitation
 
 export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
+  const [allTimeLeaderboard, setAllTimeLeaderboard] = React.useState(new Map<String, InvitationalAthlete>());
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
   /* TODO: Improve responsiveness */
@@ -239,6 +240,12 @@ export const InvitationalEffortTable = () => {
       const relevantInvitationals = getRelevantInvitationals(efforts, year);
       const leaderboard = calculateLeaderboard(relevantInvitationals, year);
       setLeaderboard(leaderboard);
+
+      const tempLeaderboardEntryMap = new Map<String, InvitationalAthlete>();
+      calculateLeaderboard(efforts.invitationalEfforts, null).forEach(entry =>
+        tempLeaderboardEntryMap.set(entry.name, entry)
+      );
+      setAllTimeLeaderboard(tempLeaderboardEntryMap);
 
       const invitationals = dedupInvitationals(
         relevantInvitationals.map(effort => effort.invitational),
@@ -398,23 +405,34 @@ export const InvitationalEffortTable = () => {
                     </Anchor>
                   </td>
                   {invitationals.map((invitational, i) => {
-                    const invitationalEffort = athlete.efforts[invitational.id];
+                    const invitationalEffort: LeaderboardInvitationalEffort = athlete.efforts[invitational.id];
+                    const fixId = invitational.id.substring(0, invitational.id.length - 4) + '2023'; //TODO fix by not using id as key, name instead? possible?
+
+                    const bestDuration = allTimeLeaderboard.get(athlete.name)?.efforts?.[fixId]?.effort?.duration;
+
+                    const prTag = year !== null && bestDuration === invitationalEffort?.effort?.duration ? '*' : '';
+
                     const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
                     const invitationalRankColor =
                       invitationalRank && invitationalRank <= 3
                         ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
                         : undefined;
+
                     return invitationalEffort ? (
                       <td key={athlete.profile + '-seg-' + i}>
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
                             <Tooltip label={EffortTooltip(invitationalEffort)} position="left">
-                              <Text color={invitationalRankColor}>{getDurationInMMSS(invitationalEffort.effort)}</Text>
+                              <Text color={invitationalRankColor}>
+                                {getDurationInMMSS(invitationalEffort.effort) + prTag}
+                              </Text>
                             </Tooltip>
                           </Anchor>
                         ) : (
                           <Tooltip label={EffortTooltip(invitationalEffort)} position="left">
-                            <Text color={invitationalRankColor}>{getDurationInMMSS(invitationalEffort.effort)}</Text>
+                            <Text color={invitationalRankColor}>
+                              {getDurationInMMSS(invitationalEffort.effort) + prTag}
+                            </Text>
                           </Tooltip>
                         )}
                       </td>
