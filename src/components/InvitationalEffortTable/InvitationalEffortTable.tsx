@@ -230,7 +230,7 @@ export const InvitationalEffortTable = () => {
   const { width } = useViewportSize();
   const titleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
-  const [year, setYear] = useState<number | null>(2022);
+  const [year, setYear] = useState<number | null>(2023);
 
   const { efforts } = useEfforts();
 
@@ -272,6 +272,7 @@ export const InvitationalEffortTable = () => {
             }}
             value={year ? `${year}` : null}
             data={[
+              { value: '2023', label: '2023' },
               { value: '2022', label: '2022' },
               { value: '2021', label: '2021' },
               { value: '2020', label: '2020' },
