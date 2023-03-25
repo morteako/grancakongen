@@ -391,7 +391,7 @@ export const InvitationalEffortTable = () => {
                   <td>
                     <Anchor href={`http://www.strava.com${athlete.profile}`}>
                       <Tooltip label={athlete.name} position="left">
-                        <Text>{athlete.name.split(' ')[0]}</Text>
+                        <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{getDisplayedName(athlete)}</Text>
                       </Tooltip>
                     </Anchor>
                   </td>
@@ -428,6 +428,11 @@ export const InvitationalEffortTable = () => {
       </Box>
     </Stack>
   );
+};
+
+const getDisplayedName = (athlethe: InvitationalAthlete) => {
+  const splitted = athlethe.name.split(' ');
+  return `${splitted[0]} ${splitted[splitted.length - 1]?.[0]}.`;
 };
 
 const getDurationInMMSS = (effort: InvitationalEffort) => {
