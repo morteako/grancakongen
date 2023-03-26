@@ -391,7 +391,9 @@ export const InvitationalEffortTable = () => {
                   <td>
                     <Anchor href={`http://www.strava.com${athlete.profile}`}>
                       <Tooltip label={athlete.name} position="left">
-                        <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{getDisplayedName(athlete)}</Text>
+                        <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                          {getDisplayedName(athlete, sortedLeaderboard)}
+                        </Text>
                       </Tooltip>
                     </Anchor>
                   </td>
@@ -430,9 +432,13 @@ export const InvitationalEffortTable = () => {
   );
 };
 
-const getDisplayedName = (athlethe: InvitationalAthlete) => {
-  const splitted = athlethe.name.split(' ');
-  return `${splitted[0]} ${splitted[splitted.length - 1]?.[0]}.`;
+const getDisplayedName = (athlete: InvitationalAthlete, allAthletes: InvitationalAthlete[]) => {
+  const { name } = athlete;
+  const splitted = name.split(' ');
+  const firstName = splitted[0];
+  if (allAthletes.some(otherAthlete => otherAthlete.name.split(' ')[0] === firstName && name !== otherAthlete.name))
+    return `${firstName} ${splitted[splitted.length - 1]?.[0]}.`;
+  return firstName;
 };
 
 const getDurationInMMSS = (effort: InvitationalEffort) => {
