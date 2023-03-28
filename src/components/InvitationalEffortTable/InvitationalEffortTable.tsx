@@ -392,7 +392,7 @@ export const InvitationalEffortTable = () => {
                     <Anchor href={`http://www.strava.com${athlete.profile}`}>
                       <Tooltip label={athlete.name} position="left">
                         <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                          {getDisplayedName(athlete, sortedLeaderboard)}
+                          {getDisplayedName(athlete, efforts?.invitationalEfforts)}
                         </Text>
                       </Tooltip>
                     </Anchor>
@@ -432,11 +432,12 @@ export const InvitationalEffortTable = () => {
   );
 };
 
-const getDisplayedName = (athlete: InvitationalAthlete, allAthletes: InvitationalAthlete[]) => {
+const getDisplayedName = (athlete: InvitationalAthlete, allEfforts: InvitationalEffortGroup[] | undefined) => {
+  const allNames = (allEfforts || []).flatMap(effortGroup => effortGroup.efforts.map(effort => effort.name));
   const { name } = athlete;
   const splitted = name.split(' ');
   const firstName = splitted[0];
-  if (allAthletes.some(otherAthlete => otherAthlete.name.split(' ')[0] === firstName && name !== otherAthlete.name))
+  if (allNames.some(otherAthleteName => otherAthleteName.split(' ')[0] === firstName && name !== otherAthleteName))
     return `${firstName} ${splitted[splitted.length - 1]?.[0]}.`;
   return firstName;
 };
