@@ -108,30 +108,44 @@ const calculateScoreByRank = (rank: number) => {
   return points;
 };
 
-const getRelevantInvitationals = (efforts: ClubEfforts, year: number | null) => {
-  return efforts.invitationalEfforts.filter(effort => (year ? effort.invitational.year === year : true));
+const getRelevantInvitationals = (efforts: ClubEfforts, filterMode: FilterMode) => {
+  switch (filterMode.type) {
+    case 'alltime':
+      return efforts.invitationalEfforts;
+    case 'year':
+      return efforts.invitationalEfforts.filter(effort => effort.invitational.year === filterMode.year);
+    case 'segment':
+      return efforts.invitationalEfforts.filter(
+        effort => effort.invitational.name === filterMode.segment && effort.efforts.length > 0
+      );
+  }
 };
 
-const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], year: number | null) => {
+const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], filterMode: FilterMode) => {
   const athletes: { [profile: string]: InvitationalAthlete } = {};
   let filteredEfforts: InvitationalEffortGroup[];
-  if (year) {
-    filteredEfforts = invitationalEfforts;
-  } else {
-    const bestEfforts = calculateBestEffortsForPersonEvent(invitationalEfforts);
+  switch (filterMode.type) {
+    case 'year':
+      filteredEfforts = invitationalEfforts;
+      break;
+    case 'segment':
+      filteredEfforts = invitationalEfforts;
+      break;
+    case 'alltime':
+      const bestEfforts = calculateBestEffortsForPersonEvent(invitationalEfforts);
 
-    filteredEfforts = invitationalEfforts.flatMap(event => {
-      const res = bestEfforts.get(event.invitational.name);
-      if (res === undefined) {
-        console.error(`${event.invitational.name} missing. Should not happen.`);
-        return [];
-      }
-      return {
-        invitational: event.invitational,
-        efforts: Array.from(res.values()),
-      };
-    });
-    filteredEfforts = dedupInvitationals(filteredEfforts, x => x.invitational, year);
+      filteredEfforts = invitationalEfforts.flatMap(event => {
+        const res = bestEfforts.get(event.invitational.name);
+        if (res === undefined) {
+          console.error(`${event.invitational.name} missing. Should not happen.`);
+          return [];
+        }
+        return {
+          invitational: event.invitational,
+          efforts: Array.from(res.values()),
+        };
+      });
+      filteredEfforts = dedupInvitationalsAlltime(filteredEfforts);
   }
   // Set/count athletes
 
@@ -215,10 +229,39 @@ const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) 
   return bestEffortsForPersonEvent;
 };
 
-const dedupInvitationals = <T,>(invitationals: T[], getInv: (x: T) => Invitational, year: number | null) => {
-  if (year) return invitationals;
-  const uniqueInvitationalNames = new Map<string, T>();
-  invitationals.forEach(inv => uniqueInvitationalNames.set(getInv(inv).name, inv));
+type FilterMode = { type: 'year'; year: number } | { type: 'alltime' } | { type: 'segment'; segment: string };
+
+const parseFilterMode = (string: string | null, segmentNames: string[]): FilterMode | null => {
+  if (string === null) return null;
+  if (string === 'alltime') return { type: 'alltime' };
+  if (['2020', '2021', '2022', '2023'].includes(string)) return { type: 'year', year: parseInt(string, 10) };
+  if (segmentNames.includes(string)) return { type: 'segment', segment: string };
+  return null;
+};
+
+const displayFilterMode = (filterMode: FilterMode): string => {
+  switch (filterMode.type) {
+    case 'alltime':
+      return 'alltime';
+    case 'year':
+      return filterMode.year + '';
+    case 'segment':
+      return filterMode.segment;
+  }
+};
+
+type TitleType = 'initials' | 'short' | 'full';
+
+const dedupInvitationals = (invitationals: Invitational[], filterMode: FilterMode) => {
+  if (filterMode.type !== 'alltime') return invitationals;
+  const uniqueInvitationalNames = new Map<string, Invitational>();
+  invitationals.forEach(inv => uniqueInvitationalNames.set(inv.name, inv));
+  return Array.from(uniqueInvitationalNames.values());
+};
+
+const dedupInvitationalsAlltime = (invitationals: InvitationalEffortGroup[]) => {
+  const uniqueInvitationalNames = new Map<string, InvitationalEffortGroup>();
+  invitationals.forEach(inv => uniqueInvitationalNames.set(inv.invitational.name, inv));
   return Array.from(uniqueInvitationalNames.values());
 };
 
@@ -229,33 +272,34 @@ export const InvitationalEffortTable = () => {
 
   /* TODO: Improve responsiveness */
   const { width } = useViewportSize();
-  const titleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
+  const titleType: TitleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
-  const [year, setYear] = useState<number | null>(2023);
+  const defaultYear2023Mode: FilterMode = { type: 'year', year: 2023 };
+
+  const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2023Mode);
 
   const { efforts } = useEfforts();
 
   React.useEffect(() => {
     if (efforts) {
-      const relevantInvitationals = getRelevantInvitationals(efforts, year);
-      const leaderboard = calculateLeaderboard(relevantInvitationals, year);
+      const relevantInvitationals = getRelevantInvitationals(efforts, filterMode);
+      const leaderboard = calculateLeaderboard(relevantInvitationals, filterMode);
       setLeaderboard(leaderboard);
 
       const tempLeaderboardEntryMap = new Map<String, InvitationalAthlete>();
-      calculateLeaderboard(efforts.invitationalEfforts, null).forEach(entry =>
+      calculateLeaderboard(efforts.invitationalEfforts, {type:"alltime"}).forEach(entry =>
         tempLeaderboardEntryMap.set(entry.name, entry)
       );
       setAllTimeLeaderboard(tempLeaderboardEntryMap);
 
       const invitationals = dedupInvitationals(
         relevantInvitationals.map(effort => effort.invitational),
-        x => x,
-        year
+        filterMode
       );
 
       setInvitationals(invitationals);
     }
-  }, [efforts, year]);
+  }, [efforts, filterMode]);
 
   const history = useHistory();
 
@@ -268,6 +312,12 @@ export const InvitationalEffortTable = () => {
   const colorStrength = 6;
   const medalColors = ['yellow', 'gray', 'orange'];
 
+  const segmentSelectData = dedupInvitationalsAlltime(efforts?.invitationalEfforts || []).map(i => ({
+    value: i.invitational.name,
+    label: i.invitational.name,
+    group: 'Races',
+  }));
+
   return (
     <Stack>
       <Flex justify="center">
@@ -275,18 +325,22 @@ export const InvitationalEffortTable = () => {
           <Select
             onChange={value => {
               history.push({ search: `filter=year&year=${value}` });
-              setYear(value ? parseInt(value) : null);
+              setFilterMode(
+                parseFilterMode(
+                  value,
+                  segmentSelectData.map(s => s.value)
+                ) || defaultYear2023Mode
+              );
             }}
-            value={year ? `${year}` : null}
+            value={displayFilterMode(filterMode)}
             data={[
-              { value: '2023', label: '2023' },
-              { value: '2022', label: '2022' },
-              { value: '2021', label: '2021' },
-              { value: '2020', label: '2020' },
-              // { value: null, label: 'All time' },
+              { value: '2023', label: '2023', group: 'Year' },
+              { value: '2022', label: '2022', group: 'Year' },
+              { value: '2021', label: '2021', group: 'Year' },
+              { value: '2020', label: '2020', group: 'Year' },
+              { value: 'alltime', label: 'All-time', group: 'Other' },
+              ...segmentSelectData,
             ]}
-            placeholder="All time"
-            clearable
           />
         </Box>
       </Flex>
@@ -336,21 +390,7 @@ export const InvitationalEffortTable = () => {
                   <Flex justify="space-between" align="center">
                     <Tooltip label={invitational.description} position="bottom" fw="normal">
                       <Text style={{ textTransform: 'uppercase' }} fz="xs" fw="bolder">
-                        {invitational.segment ? (
-                          <Anchor href={`http://www.strava.com${invitational.segment}`}>
-                            {titleType === 'initials'
-                              ? invitational.initials
-                              : titleType === 'short'
-                              ? invitational.shortName
-                              : invitational.name}
-                          </Anchor>
-                        ) : titleType === 'initials' ? (
-                          invitational.initials
-                        ) : titleType === 'short' ? (
-                          invitational.shortName
-                        ) : (
-                          invitational.name
-                        )}
+                        <InvitationalTitle invitational={invitational} titleType={titleType} filterMode={filterMode} />
                       </Text>
                     </Tooltip>
 
@@ -410,7 +450,7 @@ export const InvitationalEffortTable = () => {
 
                     const bestDuration = allTimeLeaderboard.get(athlete.name)?.efforts?.[fixId]?.effort?.duration;
 
-                    const prTag = year !== null && bestDuration === invitationalEffort?.effort?.duration ? '*' : '';
+                    const prTag = filterMode.type !== "alltime" && bestDuration === invitationalEffort?.effort?.duration ? '*' : '';
 
                     const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
                     const invitationalRankColor =
@@ -448,6 +488,19 @@ export const InvitationalEffortTable = () => {
       </Box>
     </Stack>
   );
+};
+
+const InvitationalTitle = (props: { invitational: Invitational; titleType: TitleType; filterMode: FilterMode }) => {
+  const { invitational, titleType, filterMode } = props;
+
+  let title: string;
+  if (filterMode.type === 'segment') title = invitational.year + '';
+  else if (titleType === 'initials') title = invitational.initials;
+  else if (titleType === 'short') title = invitational.shortName;
+  else title = invitational.name;
+
+  if (!invitational.segment) return <>{title} </>;
+  return <Anchor href={`http://www.strava.com${invitational.segment}`}>{title}</Anchor>;
 };
 
 const getDisplayedName = (athlete: InvitationalAthlete, allEfforts: InvitationalEffortGroup[] | undefined) => {
