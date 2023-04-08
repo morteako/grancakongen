@@ -10,23 +10,23 @@ import {
   LeaderboardInvitationalEffort,
   InvitationalEffortGroup,
 } from '../../types';
-import { ActionIcon, Anchor, Box, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Box, Divider, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 
 type SortBy =
   | {
-    type: 'rank';
-    inverted: boolean;
-  }
+      type: 'rank';
+      inverted: boolean;
+    }
   | {
-    type: 'name';
-    inverted: boolean;
-  }
+      type: 'name';
+      inverted: boolean;
+    }
   | {
-    type: 'invitational';
-    inverted: boolean;
-    invitationalId: string;
-  };
+      type: 'invitational';
+      inverted: boolean;
+      invitationalId: string;
+    };
 
 const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => {
   switch (sortBy.type) {
@@ -55,12 +55,28 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
 
-const EffortTooltip = (effort: LeaderboardInvitationalEffort) => {
+const EffortTooltip = (
+  effort: LeaderboardInvitationalEffort,
+  filterMode: FilterMode,
+  allEfforts: InvitationalEffort[]
+) => {
+  const extraInfo =
+    filterMode.type !== 'race' ? ( //TODO FIX DIVER
+      <>
+        <Divider color="black" size={'large'} />
+        {allEfforts.map((curEffort, i) => (
+          <Text key={curEffort.activity + i}>
+            {curEffort.year} : {getDurationInMMSS(curEffort)}
+          </Text>
+        ))}
+      </>
+    ) : null;
   return (
     <Stack spacing="xs" align="flex-start">
       <Text>Rank: {effort.effort.localRank}</Text>
       <Text>Points: {effort.points}</Text>
       {effort.effort.year === undefined ? <></> : <Text>Year: {effort.effort.year}</Text>}
+      {extraInfo}
     </Stack>
   );
 };
@@ -141,13 +157,11 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
           return [];
         }
         const onlyBestEfforts = Array.from(res.values()).map(athleteEffort =>
-          athleteEffort.reduce((prev, current) =>
-            (prev.duration < current.duration) ? prev : current
-          )
+          athleteEffort.reduce((prev, current) => (prev.duration < current.duration ? prev : current))
         );
         return {
           invitational: event.invitational,
-          efforts: onlyBestEfforts
+          efforts: onlyBestEfforts,
         };
       });
       filteredEfforts = dedupInvitationalsAlltime(filteredEfforts);
@@ -157,13 +171,13 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
   filteredEfforts.forEach(invitationalEffort =>
     invitationalEffort.efforts.forEach(
       effort =>
-      (athletes[effort.profile] = {
-        name: effort.name,
-        profile: effort.profile,
-        efforts: {},
-        totalPoints: 0,
-        rank: 0,
-      })
+        (athletes[effort.profile] = {
+          name: effort.name,
+          profile: effort.profile,
+          efforts: {},
+          totalPoints: 0,
+          rank: 0,
+        })
     )
   );
 
@@ -201,8 +215,7 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
   return leaderboard;
 };
 
-type EventAthleteEffortsMap = Map<string, Map<string, InvitationalEffort[]>>
-
+type EventAthleteEffortsMap = Map<string, Map<string, InvitationalEffort[]>>;
 
 const groupAthleteEffortsByEvent = (efforts: InvitationalEffortGroup[]): EventAthleteEffortsMap => {
   const bestEffortsForPersonEvent = new Map<string, Map<string, InvitationalEffort[]>>();
@@ -224,10 +237,7 @@ const groupAthleteEffortsByEvent = (efforts: InvitationalEffortGroup[]): EventAt
       if (currentPersonBestEfforts === undefined) {
         eventMap.set(effort.name, [{ ...effort, year: inviEfforts.invitational.year }]);
       } else {
-        eventMap.set(
-          effort.name,
-          [...currentPersonBestEfforts, { ...effort, year: inviEfforts.invitational.year }]
-        );
+        eventMap.set(effort.name, [...currentPersonBestEfforts, { ...effort, year: inviEfforts.invitational.year }]);
       }
     });
   });
@@ -401,15 +411,15 @@ export const InvitationalEffortTable = () => {
                         setSortBy(
                           sortBy.type === 'invitational' && sortBy.invitationalId === invitational.id
                             ? {
-                              type: 'invitational',
-                              inverted: !sortBy.inverted,
-                              invitationalId: invitational.id,
-                            }
+                                type: 'invitational',
+                                inverted: !sortBy.inverted,
+                                invitationalId: invitational.id,
+                              }
                             : {
-                              type: 'invitational',
-                              inverted: false,
-                              invitationalId: invitational.id,
-                            }
+                                type: 'invitational',
+                                inverted: false,
+                                invitationalId: invitational.id,
+                              }
                         )
                       }
                     >
@@ -423,6 +433,7 @@ export const InvitationalEffortTable = () => {
           <tbody>
             {sortedLeaderboard.map(athlete => {
               const rankColor = athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined;
+
               return (
                 <tr key={athlete.profile}>
                   <td>
@@ -445,43 +456,40 @@ export const InvitationalEffortTable = () => {
                     </Anchor>
                   </td>
                   {invitationals.map((invitational, i) => {
-                    const invitationalEffort: LeaderboardInvitationalEffort | undefined = athlete.efforts[invitational.id];
+                    const invitationalEffort = athlete.efforts[invitational.id];
+                    if (!invitationalEffort) {
+                      /* Display '–' for no recorded time */
+                      return <td key={athlete.profile + '-seg-' + i}>-</td>;
+                    }
 
-                    const durations = allTimeLeaderboard.get(invitational.name)?.get(athlete.name)?.map(x => x.duration) || []
+                    const efforts = allTimeLeaderboard.get(invitational.name)?.get(athlete.name) || [];
 
-                    const prTag = filterMode.type === "alltime" ?
-                      ' ' : durations.length == 1 ?
-                        '**' : Math.min(...durations) === invitationalEffort?.effort?.duration ?
-                          '*' :
-                          ''
+                    const prTag = getPrTag(filterMode, efforts, invitationalEffort.effort.duration);
 
-
-                    const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
+                    const invitationalRank = invitationalEffort.effort.localRank;
                     const invitationalRankColor =
                       invitationalRank && invitationalRank <= 3
                         ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
                         : undefined;
 
-                    return invitationalEffort ? (
+                    return (
                       <td key={athlete.profile + '-seg-' + i}>
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
-                            <Tooltip label={EffortTooltip(invitationalEffort)} position="left">
+                            <Tooltip label={EffortTooltip(invitationalEffort, filterMode, efforts)} position="left">
                               <Text color={invitationalRankColor}>
                                 {getDurationInMMSS(invitationalEffort.effort) + prTag}
                               </Text>
                             </Tooltip>
                           </Anchor>
                         ) : (
-                          <Tooltip label={EffortTooltip(invitationalEffort)} position="left">
+                          <Tooltip label={EffortTooltip(invitationalEffort, filterMode, efforts)} position="left">
                             <Text color={invitationalRankColor}>
                               {getDurationInMMSS(invitationalEffort.effort) + prTag}
                             </Text>
                           </Tooltip>
                         )}
                       </td>
-                    ) : (
-                      <td key={athlete.profile + '-seg-' + i}>-</td>
                     );
                   })}
                 </tr>
@@ -492,6 +500,13 @@ export const InvitationalEffortTable = () => {
       </Box>
     </Stack>
   );
+};
+
+const getPrTag = (filterMode: FilterMode, efforts: InvitationalEffort[], duration: number) => {
+  if (filterMode.type === 'alltime') return '';
+  if (efforts.length == 1) return '**';
+  if (Math.min(...efforts.map(x => x.duration)) === duration) return '*';
+  return '';
 };
 
 const InvitationalTitle = (props: { invitational: Invitational; titleType: TitleType; filterMode: FilterMode }) => {
