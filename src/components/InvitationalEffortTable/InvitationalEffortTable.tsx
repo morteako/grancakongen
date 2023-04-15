@@ -114,9 +114,9 @@ const getRelevantInvitationals = (efforts: ClubEfforts, filterMode: FilterMode) 
       return efforts.invitationalEfforts;
     case 'year':
       return efforts.invitationalEfforts.filter(effort => effort.invitational.year === filterMode.year);
-    case 'segment':
+    case 'race':
       return efforts.invitationalEfforts.filter(
-        effort => effort.invitational.name === filterMode.segment && effort.efforts.length > 0
+        effort => effort.invitational.name === filterMode.name && effort.efforts.length > 0
       );
   }
 };
@@ -128,7 +128,7 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
     case 'year':
       filteredEfforts = invitationalEfforts;
       break;
-    case 'segment':
+    case 'race':
       filteredEfforts = invitationalEfforts;
       break;
     case 'alltime':
@@ -229,13 +229,13 @@ const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) 
   return bestEffortsForPersonEvent;
 };
 
-type FilterMode = { type: 'year'; year: number } | { type: 'alltime' } | { type: 'segment'; segment: string };
+type FilterMode = { type: 'year'; year: number } | { type: 'alltime' } | { type: 'race'; name: string };
 
 const parseFilterMode = (string: string | null, segmentNames: string[]): FilterMode | null => {
   if (string === null) return null;
   if (string === 'alltime') return { type: 'alltime' };
   if (['2020', '2021', '2022', '2023'].includes(string)) return { type: 'year', year: parseInt(string, 10) };
-  if (segmentNames.includes(string)) return { type: 'segment', segment: string };
+  if (segmentNames.includes(string)) return { type: 'race', name: string };
   return null;
 };
 
@@ -244,9 +244,9 @@ const displayFilterMode = (filterMode: FilterMode): string => {
     case 'alltime':
       return 'alltime';
     case 'year':
-      return filterMode.year + '';
-    case 'segment':
-      return filterMode.segment;
+      return `${filterMode.year}`;
+    case 'race':
+      return filterMode.name;
   }
 };
 
@@ -270,7 +270,6 @@ export const InvitationalEffortTable = () => {
   const [allTimeLeaderboard, setAllTimeLeaderboard] = React.useState(new Map<String, InvitationalAthlete>());
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
-  /* TODO: Improve responsiveness */
   const { width } = useViewportSize();
   const titleType: TitleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
@@ -287,7 +286,7 @@ export const InvitationalEffortTable = () => {
       setLeaderboard(leaderboard);
 
       const tempLeaderboardEntryMap = new Map<String, InvitationalAthlete>();
-      calculateLeaderboard(efforts.invitationalEfforts, {type:"alltime"}).forEach(entry =>
+      calculateLeaderboard(efforts.invitationalEfforts, { type: 'alltime' }).forEach(entry =>
         tempLeaderboardEntryMap.set(entry.name, entry)
       );
       setAllTimeLeaderboard(tempLeaderboardEntryMap);
@@ -312,7 +311,7 @@ export const InvitationalEffortTable = () => {
   const colorStrength = 6;
   const medalColors = ['yellow', 'gray', 'orange'];
 
-  const segmentSelectData = dedupInvitationalsAlltime(efforts?.invitationalEfforts || []).map(i => ({
+  const racesSelectData = dedupInvitationalsAlltime(efforts?.invitationalEfforts || []).map(i => ({
     value: i.invitational.name,
     label: i.invitational.name,
     group: 'Races',
@@ -328,7 +327,7 @@ export const InvitationalEffortTable = () => {
               setFilterMode(
                 parseFilterMode(
                   value,
-                  segmentSelectData.map(s => s.value)
+                  racesSelectData.map(s => s.value)
                 ) || defaultYear2023Mode
               );
             }}
@@ -339,7 +338,7 @@ export const InvitationalEffortTable = () => {
               { value: '2021', label: '2021', group: 'Year' },
               { value: '2020', label: '2020', group: 'Year' },
               { value: 'alltime', label: 'All-time', group: 'Other' },
-              ...segmentSelectData,
+              ...racesSelectData,
             ]}
           />
         </Box>
@@ -450,7 +449,8 @@ export const InvitationalEffortTable = () => {
 
                     const bestDuration = allTimeLeaderboard.get(athlete.name)?.efforts?.[fixId]?.effort?.duration;
 
-                    const prTag = filterMode.type !== "alltime" && bestDuration === invitationalEffort?.effort?.duration ? '*' : '';
+                    const prTag =
+                      filterMode.type !== 'alltime' && bestDuration === invitationalEffort?.effort?.duration ? '*' : '';
 
                     const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
                     const invitationalRankColor =
@@ -493,11 +493,12 @@ export const InvitationalEffortTable = () => {
 const InvitationalTitle = (props: { invitational: Invitational; titleType: TitleType; filterMode: FilterMode }) => {
   const { invitational, titleType, filterMode } = props;
 
-  let title: string;
-  if (filterMode.type === 'segment') title = invitational.year + '';
-  else if (titleType === 'initials') title = invitational.initials;
-  else if (titleType === 'short') title = invitational.shortName;
-  else title = invitational.name;
+  const title = (() => {
+    if (filterMode.type === 'race') return `${invitational.year}`;
+    else if (titleType === 'initials') return invitational.initials;
+    else if (titleType === 'short') return invitational.shortName;
+    else return invitational.name;
+  })();
 
   if (!invitational.segment) return <>{title} </>;
   return <Anchor href={`http://www.strava.com${invitational.segment}`}>{title}</Anchor>;
