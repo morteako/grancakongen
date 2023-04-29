@@ -12,6 +12,7 @@ import {
 } from '../../types';
 import { ActionIcon, Anchor, Box, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
+import { displayFilterMode, FilterMode, filterModeToQuery, findFilterMode, parseFilterMode } from './FilterMode';
 
 type SortBy =
   | {
@@ -229,46 +230,6 @@ const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) 
   return bestEffortsForPersonEvent;
 };
 
-type FilterMode = { type: 'year'; year: number } | { type: 'alltime' } | { type: 'race'; name: string };
-
-const filterModeToQuery = (filterMode: FilterMode) => {
-  const base = `filter=${filterMode.type}`;
-  switch (filterMode.type) {
-    case 'alltime':
-      return `${base}`;
-    case 'year':
-      return `${base}&year=${filterMode.year}`;
-    case 'race':
-      return `${base}&name=${filterMode.name}`;
-  }
-};
-
-const parseFilterMode = (string: string | null, segmentNames: string[]): FilterMode | null => {
-  if (string === null) return null;
-  if (string === 'alltime') return { type: 'alltime' };
-  if (years[string]) return { type: 'year', year: years[string] };
-  if (segmentNames.includes(string)) return { type: 'race', name: string };
-  return null;
-};
-
-const displayFilterMode = (filterMode: FilterMode): string => {
-  switch (filterMode.type) {
-    case 'alltime':
-      return 'alltime';
-    case 'year':
-      return `${filterMode.year}`;
-    case 'race':
-      return filterMode.name;
-  }
-};
-
-const years = {
-  '2020': 2020,
-  '2021': 2021,
-  '2022': 2022,
-  '2023': 2023,
-} as Record<string, number>;
-
 type TitleType = 'initials' | 'short' | 'full';
 
 const dedupInvitationals = (invitationals: Invitational[], filterMode: FilterMode) => {
@@ -302,22 +263,7 @@ export const InvitationalEffortTable = () => {
   const urlParams = new URLSearchParams(search);
 
   React.useEffect(() => {
-    const filter = urlParams.get('filter');
-    const findFilterMode = (): FilterMode | null => {
-      if (filter === 'year') {
-        const year = years[urlParams.get('year') || ''];
-        return year ? { type: 'year', year: year } : null;
-      }
-      if (filter === 'alltime') {
-        return { type: 'alltime' };
-      }
-      if (filter === 'race') {
-        const raceName = urlParams.get('name');
-        return { type: 'race', name: raceName || '' };
-      }
-      return null;
-    };
-    setFilterMode(findFilterMode() || defaultYear2023Mode);
+    setFilterMode(findFilterMode(urlParams) || defaultYear2023Mode);
   }, []);
 
   React.useEffect(() => {
