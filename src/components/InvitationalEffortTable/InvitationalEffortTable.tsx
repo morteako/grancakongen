@@ -1,6 +1,6 @@
 import { HiChevronDown, HiChevronUp, HiChevronUpDown } from 'react-icons/hi2';
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useCallback, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import useEfforts from '../../hooks/efforts';
 import {
   InvitationalAthlete,
@@ -231,10 +231,22 @@ const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) 
 
 type FilterMode = { type: 'year'; year: number } | { type: 'alltime' } | { type: 'race'; name: string };
 
+const filterModeToQuery = (filterMode: FilterMode) => {
+  const base = `filter=${filterMode.type}`;
+  switch (filterMode.type) {
+    case 'alltime':
+      return `${base}`;
+    case 'year':
+      return `${base}&year=${filterMode.year}`;
+    case 'race':
+      return `${base}&name=${filterMode.name}`;
+  }
+};
+
 const parseFilterMode = (string: string | null, segmentNames: string[]): FilterMode | null => {
   if (string === null) return null;
   if (string === 'alltime') return { type: 'alltime' };
-  if (['2020', '2021', '2022', '2023'].includes(string)) return { type: 'year', year: parseInt(string, 10) };
+  if (years[string]) return { type: 'year', year: years[string] };
   if (segmentNames.includes(string)) return { type: 'race', name: string };
   return null;
 };
@@ -249,6 +261,13 @@ const displayFilterMode = (filterMode: FilterMode): string => {
       return filterMode.name;
   }
 };
+
+const years = {
+  '2020': 2020,
+  '2021': 2021,
+  '2022': 2022,
+  '2023': 2023,
+} as Record<string, number>;
 
 type TitleType = 'initials' | 'short' | 'full';
 
@@ -278,6 +297,28 @@ export const InvitationalEffortTable = () => {
   const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2023Mode);
 
   const { efforts } = useEfforts();
+
+  const { search } = useLocation();
+  const urlParams = new URLSearchParams(search);
+
+  React.useEffect(() => {
+    const filter = urlParams.get('filter');
+    const findFilterMode = (): FilterMode | null => {
+      if (filter === 'year') {
+        const year = years[urlParams.get('year') || ''];
+        return year ? { type: 'year', year: year } : null;
+      }
+      if (filter === 'alltime') {
+        return { type: 'alltime' };
+      }
+      if (filter === 'race') {
+        const raceName = urlParams.get('name');
+        return { type: 'race', name: raceName || '' };
+      }
+      return null;
+    };
+    setFilterMode(findFilterMode() || defaultYear2023Mode);
+  }, []);
 
   React.useEffect(() => {
     if (efforts) {
@@ -323,13 +364,13 @@ export const InvitationalEffortTable = () => {
         <Box maw="500px">
           <Select
             onChange={value => {
-              history.push({ search: `filter=year&year=${value}` });
-              setFilterMode(
+              const newFilterMode =
                 parseFilterMode(
                   value,
                   racesSelectData.map(s => s.value)
-                ) || defaultYear2023Mode
-              );
+                ) || defaultYear2023Mode;
+              setFilterMode(newFilterMode);
+              history.push({ search: filterModeToQuery(newFilterMode) });
             }}
             value={displayFilterMode(filterMode)}
             data={[
