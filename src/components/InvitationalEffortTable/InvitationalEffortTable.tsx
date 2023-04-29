@@ -1,6 +1,5 @@
 import { HiChevronDown, HiChevronUp, HiChevronUpDown } from 'react-icons/hi2';
-import React, { useCallback, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
 import useEfforts from '../../hooks/efforts';
 import {
   InvitationalAthlete,
@@ -12,7 +11,7 @@ import {
 } from '../../types';
 import { ActionIcon, Anchor, Box, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
-import { displayFilterMode, FilterMode, filterModeToQuery, findFilterMode, parseFilterMode } from './FilterMode';
+import { displayFilterMode, FilterMode, useFilterMode } from './FilterMode';
 
 type SortBy =
   | {
@@ -253,17 +252,12 @@ export const InvitationalEffortTable = () => {
   const { width } = useViewportSize();
   const titleType: TitleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
-  const defaultYear2023Mode: FilterMode = { type: 'year', year: 2023 };
-
-  const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2023Mode);
+  const { filterMode, setFilterModeFromSelector, setFilterModeFromQuery } = useFilterMode();
 
   const { efforts } = useEfforts();
 
-  const { search } = useLocation();
-  const urlParams = new URLSearchParams(search);
-
   React.useEffect(() => {
-    setFilterMode(findFilterMode(urlParams) || defaultYear2023Mode);
+    setFilterModeFromQuery();
   }, []);
 
   React.useEffect(() => {
@@ -287,8 +281,6 @@ export const InvitationalEffortTable = () => {
     }
   }, [efforts, filterMode]);
 
-  const history = useHistory();
-
   const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
 
   const sortedLeaderboard = sortBy.inverted
@@ -310,13 +302,10 @@ export const InvitationalEffortTable = () => {
         <Box maw="500px">
           <Select
             onChange={value => {
-              const newFilterMode =
-                parseFilterMode(
-                  value,
-                  racesSelectData.map(s => s.value)
-                ) || defaultYear2023Mode;
-              setFilterMode(newFilterMode);
-              history.push({ search: filterModeToQuery(newFilterMode) });
+              setFilterModeFromSelector(
+                value,
+                racesSelectData.map(s => s.value)
+              );
             }}
             value={displayFilterMode(filterMode)}
             data={[
