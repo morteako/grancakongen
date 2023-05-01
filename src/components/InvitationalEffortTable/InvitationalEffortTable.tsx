@@ -1,6 +1,5 @@
 import { HiChevronDown, HiChevronUp, HiChevronUpDown } from 'react-icons/hi2';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import useEfforts from '../../hooks/efforts';
 import {
   InvitationalAthlete,
@@ -12,6 +11,7 @@ import {
 } from '../../types';
 import { ActionIcon, Anchor, Box, Divider, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
+import { displayFilterMode, FilterMode, useFilterMode } from './FilterMode';
 
 type SortBy =
   | {
@@ -245,27 +245,6 @@ const groupAthleteEffortsByEvent = (efforts: InvitationalEffortGroup[]): EventAt
   return bestEffortsForPersonEvent;
 };
 
-type FilterMode = { type: 'year'; year: number } | { type: 'alltime' } | { type: 'race'; name: string };
-
-const parseFilterMode = (string: string | null, segmentNames: string[]): FilterMode | null => {
-  if (string === null) return null;
-  if (string === 'alltime') return { type: 'alltime' };
-  if (['2020', '2021', '2022', '2023'].includes(string)) return { type: 'year', year: parseInt(string, 10) };
-  if (segmentNames.includes(string)) return { type: 'race', name: string };
-  return null;
-};
-
-const displayFilterMode = (filterMode: FilterMode): string => {
-  switch (filterMode.type) {
-    case 'alltime':
-      return 'alltime';
-    case 'year':
-      return `${filterMode.year}`;
-    case 'race':
-      return filterMode.name;
-  }
-};
-
 type TitleType = 'initials' | 'short' | 'full';
 
 const dedupInvitationals = (invitationals: Invitational[], filterMode: FilterMode) => {
@@ -289,11 +268,13 @@ export const InvitationalEffortTable = () => {
   const { width } = useViewportSize();
   const titleType: TitleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
-  const defaultYear2023Mode: FilterMode = { type: 'year', year: 2023 };
-
-  const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2023Mode);
+  const { filterMode, setFilterModeFromSelector, setFilterModeFromQuery } = useFilterMode();
 
   const { efforts } = useEfforts();
+
+  React.useEffect(() => {
+    setFilterModeFromQuery();
+  }, []);
 
   React.useEffect(() => {
     if (efforts) {
@@ -310,8 +291,6 @@ export const InvitationalEffortTable = () => {
       setInvitationals(invitationals);
     }
   }, [efforts, filterMode]);
-
-  const history = useHistory();
 
   const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
 
@@ -334,12 +313,9 @@ export const InvitationalEffortTable = () => {
         <Box maw="500px">
           <Select
             onChange={value => {
-              history.push({ search: `filter=year&year=${value}` });
-              setFilterMode(
-                parseFilterMode(
-                  value,
-                  racesSelectData.map(s => s.value)
-                ) || defaultYear2023Mode
+              setFilterModeFromSelector(
+                value,
+                racesSelectData.map(s => s.value)
               );
             }}
             value={displayFilterMode(filterMode)}
