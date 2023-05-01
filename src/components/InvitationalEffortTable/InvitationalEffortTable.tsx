@@ -61,9 +61,9 @@ const EffortTooltip = (
   allEfforts: InvitationalEffort[]
 ) => {
   const extraInfo =
-    filterMode.type !== 'race' ? ( //TODO FIX DIVER
+    filterMode.type !== 'race' ? (
       <>
-        <Divider color="black" size={'large'} />
+        <Divider style={{ width: '100%' }} />
         {allEfforts.map((curEffort, i) => (
           <Text key={curEffort.activity + i}>
             {curEffort.year} : {getDurationInMMSS(curEffort)}
