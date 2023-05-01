@@ -9,7 +9,7 @@ import {
   LeaderboardInvitationalEffort,
   InvitationalEffortGroup,
 } from '../../types';
-import { ActionIcon, Anchor, Box, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Box, Divider, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import { displayFilterMode, FilterMode, useFilterMode } from './FilterMode';
 
@@ -55,12 +55,28 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
 
-const EffortTooltip = (effort: LeaderboardInvitationalEffort) => {
+const EffortTooltip = (
+  effort: LeaderboardInvitationalEffort,
+  filterMode: FilterMode,
+  allEfforts: InvitationalEffort[]
+) => {
+  const extraInfo =
+    filterMode.type !== 'race' ? (
+      <>
+        <Divider style={{ width: '100%' }} />
+        {allEfforts.map((curEffort, i) => (
+          <Text key={curEffort.activity + i}>
+            {curEffort.year} : {getDurationInMMSS(curEffort)}
+          </Text>
+        ))}
+      </>
+    ) : null;
   return (
     <Stack spacing="xs" align="flex-start">
       <Text>Rank: {effort.effort.localRank}</Text>
       <Text>Points: {effort.points}</Text>
       {effort.effort.year === undefined ? <></> : <Text>Year: {effort.effort.year}</Text>}
+      {extraInfo}
     </Stack>
   );
 };
@@ -132,17 +148,20 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
       filteredEfforts = invitationalEfforts;
       break;
     case 'alltime':
-      const bestEfforts = calculateBestEffortsForPersonEvent(invitationalEfforts);
+      const allEfforts = groupAthleteEffortsByEvent(invitationalEfforts);
 
       filteredEfforts = invitationalEfforts.flatMap(event => {
-        const res = bestEfforts.get(event.invitational.name);
+        const res = allEfforts.get(event.invitational.name);
         if (res === undefined) {
           console.error(`${event.invitational.name} missing. Should not happen.`);
           return [];
         }
+        const onlyBestEfforts = Array.from(res.values()).map(athleteEffort =>
+          athleteEffort.reduce((prev, current) => (prev.duration < current.duration ? prev : current))
+        );
         return {
           invitational: event.invitational,
-          efforts: Array.from(res.values()),
+          efforts: onlyBestEfforts,
         };
       });
       filteredEfforts = dedupInvitationalsAlltime(filteredEfforts);
@@ -196,32 +215,29 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
   return leaderboard;
 };
 
-const calculateBestEffortsForPersonEvent = (efforts: InvitationalEffortGroup[]) => {
-  const bestEffort = (a: InvitationalEffort, b: InvitationalEffort) => (a.duration < b.duration ? a : b);
+type EventAthleteEffortsMap = Map<string, Map<string, InvitationalEffort[]>>;
 
-  const bestEffortsForPersonEvent = new Map<string, Map<string, InvitationalEffort>>();
+const groupAthleteEffortsByEvent = (efforts: InvitationalEffortGroup[]): EventAthleteEffortsMap => {
+  const bestEffortsForPersonEvent = new Map<string, Map<string, InvitationalEffort[]>>();
 
   //populate bestEffortsForPersonEvent
   efforts.forEach(inviEfforts => {
-    const name = inviEfforts.invitational.name;
-    const bestEffortsForEvent = bestEffortsForPersonEvent.get(name);
-    let eventMap: Map<string, InvitationalEffort>;
+    const inviName = inviEfforts.invitational.name;
+    const bestEffortsForEvent = bestEffortsForPersonEvent.get(inviName);
+    let eventMap: Map<string, InvitationalEffort[]>;
     if (bestEffortsForEvent === undefined) {
       eventMap = new Map();
-      bestEffortsForPersonEvent.set(name, eventMap);
+      bestEffortsForPersonEvent.set(inviName, eventMap);
     } else {
       eventMap = bestEffortsForEvent;
     }
 
     inviEfforts.efforts.forEach(effort => {
-      const currentPersonBestEffort = eventMap.get(effort.name);
-      if (currentPersonBestEffort === undefined) {
-        eventMap.set(effort.name, { ...effort, year: inviEfforts.invitational.year });
+      const currentPersonBestEfforts = eventMap.get(effort.name);
+      if (currentPersonBestEfforts === undefined) {
+        eventMap.set(effort.name, [{ ...effort, year: inviEfforts.invitational.year }]);
       } else {
-        eventMap.set(
-          effort.name,
-          bestEffort({ ...effort, year: inviEfforts.invitational.year }, currentPersonBestEffort)
-        );
+        eventMap.set(effort.name, [...currentPersonBestEfforts, { ...effort, year: inviEfforts.invitational.year }]);
       }
     });
   });
@@ -246,7 +262,7 @@ const dedupInvitationalsAlltime = (invitationals: InvitationalEffortGroup[]) => 
 
 export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
-  const [allTimeLeaderboard, setAllTimeLeaderboard] = React.useState(new Map<String, InvitationalAthlete>());
+  const [allTimeLeaderboard, setAllTimeLeaderboard] = React.useState(new Map() as EventAthleteEffortsMap);
   const [invitationals, setInvitationals] = React.useState([] as Invitational[]);
 
   const { width } = useViewportSize();
@@ -265,12 +281,7 @@ export const InvitationalEffortTable = () => {
       const relevantInvitationals = getRelevantInvitationals(efforts, filterMode);
       const leaderboard = calculateLeaderboard(relevantInvitationals, filterMode);
       setLeaderboard(leaderboard);
-
-      const tempLeaderboardEntryMap = new Map<String, InvitationalAthlete>();
-      calculateLeaderboard(efforts.invitationalEfforts, { type: 'alltime' }).forEach(entry =>
-        tempLeaderboardEntryMap.set(entry.name, entry)
-      );
-      setAllTimeLeaderboard(tempLeaderboardEntryMap);
+      setAllTimeLeaderboard(groupAthleteEffortsByEvent(efforts.invitationalEfforts));
 
       const invitationals = dedupInvitationals(
         relevantInvitationals.map(effort => effort.invitational),
@@ -398,6 +409,7 @@ export const InvitationalEffortTable = () => {
           <tbody>
             {sortedLeaderboard.map(athlete => {
               const rankColor = athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined;
+
               return (
                 <tr key={athlete.profile}>
                   <td>
@@ -420,40 +432,40 @@ export const InvitationalEffortTable = () => {
                     </Anchor>
                   </td>
                   {invitationals.map((invitational, i) => {
-                    const invitationalEffort: LeaderboardInvitationalEffort = athlete.efforts[invitational.id];
-                    const fixId = invitational.id.substring(0, invitational.id.length - 4) + '2023'; //TODO fix by not using id as key, name instead? possible?
+                    const invitationalEffort = athlete.efforts[invitational.id];
+                    if (!invitationalEffort) {
+                      /* Display '–' for no recorded time */
+                      return <td key={athlete.profile + '-seg-' + i}>-</td>;
+                    }
 
-                    const bestDuration = allTimeLeaderboard.get(athlete.name)?.efforts?.[fixId]?.effort?.duration;
+                    const efforts = allTimeLeaderboard.get(invitational.name)?.get(athlete.name) || [];
 
-                    const prTag =
-                      filterMode.type !== 'alltime' && bestDuration === invitationalEffort?.effort?.duration ? '*' : '';
+                    const prTag = getPrTag(filterMode, efforts, invitationalEffort.effort.duration);
 
-                    const invitationalRank = invitationalEffort ? invitationalEffort.effort.localRank : null;
+                    const invitationalRank = invitationalEffort.effort.localRank;
                     const invitationalRankColor =
                       invitationalRank && invitationalRank <= 3
                         ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
                         : undefined;
 
-                    return invitationalEffort ? (
+                    return (
                       <td key={athlete.profile + '-seg-' + i}>
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
-                            <Tooltip label={EffortTooltip(invitationalEffort)} position="left">
+                            <Tooltip label={EffortTooltip(invitationalEffort, filterMode, efforts)} position="left">
                               <Text color={invitationalRankColor}>
                                 {getDurationInMMSS(invitationalEffort.effort) + prTag}
                               </Text>
                             </Tooltip>
                           </Anchor>
                         ) : (
-                          <Tooltip label={EffortTooltip(invitationalEffort)} position="left">
+                          <Tooltip label={EffortTooltip(invitationalEffort, filterMode, efforts)} position="left">
                             <Text color={invitationalRankColor}>
                               {getDurationInMMSS(invitationalEffort.effort) + prTag}
                             </Text>
                           </Tooltip>
                         )}
                       </td>
-                    ) : (
-                      <td key={athlete.profile + '-seg-' + i}>-</td>
                     );
                   })}
                 </tr>
@@ -464,6 +476,13 @@ export const InvitationalEffortTable = () => {
       </Box>
     </Stack>
   );
+};
+
+const getPrTag = (filterMode: FilterMode, efforts: InvitationalEffort[], duration: number) => {
+  if (filterMode.type === 'alltime') return '';
+  if (efforts.length == 1) return '⁺';
+  if (Math.min(...efforts.map(x => x.duration)) === duration) return '*';
+  return '';
 };
 
 const InvitationalTitle = (props: { invitational: Invitational; titleType: TitleType; filterMode: FilterMode }) => {
