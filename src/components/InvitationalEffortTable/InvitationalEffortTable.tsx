@@ -504,7 +504,7 @@ export const InvitationalEffortTable = () => {
 
 const getPrTag = (filterMode: FilterMode, efforts: InvitationalEffort[], duration: number) => {
   if (filterMode.type === 'alltime') return '';
-  if (efforts.length == 1) return '**';
+  if (efforts.length == 1) return '⁺';
   if (Math.min(...efforts.map(x => x.duration)) === duration) return '*';
   return '';
 };
