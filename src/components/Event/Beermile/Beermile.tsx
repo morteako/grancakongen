@@ -7,7 +7,6 @@ const Beermile = () => {
         <Stack>
           <Title>BEER MILE 2023</Title>
           <Text fw="bold">Lørdag 5. august 2023 kl 16:00 – ved Institutt for informatikk (Gaustad)</Text>
-          <Text fs="sm">Eventuell endring av lokasjon kommer senest fredag 19. august kl 18</Text>
           <Title order={2}>Regler</Title>
 
           <Text>
@@ -65,16 +64,11 @@ const Beermile = () => {
           <Title>Løypekart</Title>
           <Text>
             Vi løper [mest sannsynlig] ved Institutt for informatikk (Gaustadalléen 23B) – der er det ganske flatt,
-            asfalt og gode publikumsmuligheter. Vi skulle gjerne ha løpt på bane for optimal løype, men vi tviler på at
-            vi klarer å arrangere det på en forsvarlig måte. Vi har alternativer til vurdering, men vi tar gjerne mot
-            flere forslag!
+            asfalt og gode publikumsmuligheter, eller på Voldsløkka. Vi skulle gjerne ha løpt på bane for optimal løype,
+            men vi tviler på at vi klarer å arrangere det på en forsvarlig måte. Vi har alternativer til vurdering, men
+            vi tar gjerne mot flere forslag!
           </Text>
           <Text>Løypekaret vil være tilgjengelig her senest kl 10:00 på løpsdagen.</Text>
-          <Title>Påmelding</Title>
-          <Text>
-            Vi ønsker å sette sammen heat, og vi skal muligens få ordnet noen startnummer. Meld deg på så tidlig som
-            mulig, og si fra om du av en eller annen grunn ikke lenger har mulighet til å stille!
-          </Text>
         </Stack>
       </Stack>
     </Center>
