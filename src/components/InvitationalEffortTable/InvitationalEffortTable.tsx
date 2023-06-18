@@ -58,19 +58,20 @@ const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
 const EffortTooltip = (
   effort: LeaderboardInvitationalEffort,
   filterMode: FilterMode,
-  allEfforts: InvitationalEffort[]
+  allEfforts: InvitationalEffort[],
+  distance?: number
 ) => {
-  const extraInfo =
-    filterMode.type !== 'race' ? (
-      <>
-        <Divider style={{ width: '100%' }} />
-        {allEfforts.map((curEffort, i) => (
-          <Text key={curEffort.activity + i}>
-            {curEffort.year} : {getDurationInMMSS(curEffort)}
-          </Text>
-        ))}
-      </>
-    ) : null;
+  const extraInfo = (
+    <>
+      <Divider style={{ width: '100%' }} />
+      {allEfforts.map((curEffort, i) => (
+        <Text key={curEffort.activity + i}>
+          {curEffort.year} : {getDurationInMMSS(curEffort)}{' '}
+          {distance && `@ ${calculatePace(curEffort.duration, distance)}`}
+        </Text>
+      ))}
+    </>
+  );
   return (
     <Stack spacing="xs" align="flex-start">
       <Text>Rank: {effort.effort.localRank}</Text>
@@ -452,14 +453,20 @@ export const InvitationalEffortTable = () => {
                       <td key={athlete.profile + '-seg-' + i}>
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
-                            <Tooltip label={EffortTooltip(invitationalEffort, filterMode, efforts)} position="left">
+                            <Tooltip
+                              label={EffortTooltip(invitationalEffort, filterMode, efforts, invitational.distance)}
+                              position="left"
+                            >
                               <Text color={invitationalRankColor}>
                                 {getDurationInMMSS(invitationalEffort.effort) + prTag}
                               </Text>
                             </Tooltip>
                           </Anchor>
                         ) : (
-                          <Tooltip label={EffortTooltip(invitationalEffort, filterMode, efforts)} position="left">
+                          <Tooltip
+                            label={EffortTooltip(invitationalEffort, filterMode, efforts, invitational.distance)}
+                            position="left"
+                          >
                             <Text color={invitationalRankColor}>
                               {getDurationInMMSS(invitationalEffort.effort) + prTag}
                             </Text>
@@ -514,4 +521,12 @@ const getDurationInMMSS = (effort: InvitationalEffort) => {
   const seconds = Math.floor(effort.duration % 60);
   const secondsPadding = seconds < 10 ? '0' : '';
   return `${minutes}:${secondsPadding}${seconds}`;
+};
+
+const calculatePace = (durationInSec: number, distanceInKM: number) => {
+  const secPerKM = durationInSec / distanceInKM;
+  const minutes = Math.floor(secPerKM / 60);
+  const seconds = Math.floor(secPerKM % 60);
+  const secondsPadding = seconds < 10 ? '0' : '';
+  return `${minutes}:${secondsPadding}${seconds}/km`;
 };
