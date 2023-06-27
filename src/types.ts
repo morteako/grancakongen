@@ -24,7 +24,7 @@ export interface Invitational {
   segment: string;
   type: 'minor' | 'major';
   year: number;
-  distance?: number;
+  distance: number;
 }
 
 export interface Club {

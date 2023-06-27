@@ -523,8 +523,8 @@ const getDurationInMMSS = (effort: InvitationalEffort) => {
   return `${minutes}:${secondsPadding}${seconds}`;
 };
 
-const calculatePace = (durationInSec: number, distanceInKM: number) => {
-  const secPerKM = durationInSec / distanceInKM;
+const calculatePace = (durationInSec: number, distanceInMeters: number) => {
+  const secPerKM = (durationInSec * 1000) / distanceInMeters;
   const minutes = Math.floor(secPerKM / 60);
   const seconds = Math.floor(secPerKM % 60);
   const secondsPadding = seconds < 10 ? '0' : '';
