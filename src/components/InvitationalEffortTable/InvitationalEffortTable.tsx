@@ -183,11 +183,15 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
 
   filteredEfforts.map(invitationalEffort => {
     const effortRankMap = getEffortRankMap(invitationalEffort.efforts);
+    const isMajor = invitationalEffort.invitational.type === 'major';
 
     return invitationalEffort.efforts.map(effort => {
       const rank = effortRankMap[effort.duration];
+      const scoreByRank = calculateScoreByRank(rank);
+      const score = isMajor ? scoreByRank : Math.max(scoreByRank / 2, 1);
+
       return (athletes[effort.profile].efforts[invitationalEffort.invitational.id] = {
-        points: calculateScoreByRank(rank),
+        points: score,
         effort: { ...effort, localRank: rank + 1 },
       });
     });
