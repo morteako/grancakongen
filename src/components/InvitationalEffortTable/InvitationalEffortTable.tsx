@@ -61,22 +61,24 @@ const EffortTooltip = (
   allEfforts: InvitationalEffort[],
   distance?: number
 ) => {
+  const effortsReversed = [...allEfforts].reverse();
   const extraInfo = (
     <>
       <Divider style={{ width: '100%' }} />
-      {allEfforts.map((curEffort, i) => (
+      {effortsReversed.map((curEffort, i) => (
         <Text key={curEffort.activity + i}>
-          {curEffort.year} : {getDurationInMMSS(curEffort)}{' '}
-          {distance && `@ ${calculatePace(curEffort.duration, distance)}`}
+          {curEffort.year}: {getDurationInMMSS(curEffort)}
+          {distance && ` (${calculatePace(curEffort.duration, distance)})`}
         </Text>
       ))}
     </>
   );
   return (
     <Stack spacing="xs" align="flex-start">
-      <Text>Rank: {effort.effort.localRank}</Text>
-      <Text>Points: {effort.points}</Text>
-      {effort.effort.year === undefined ? <></> : <Text>Year: {effort.effort.year}</Text>}
+      <Text>
+        {effort.effort.year === undefined ? '' : `${effort.effort.year}: `}
+        Rank: {effort.effort.localRank} – Points: {effort.points}
+      </Text>
       {extraInfo}
     </Stack>
   );
