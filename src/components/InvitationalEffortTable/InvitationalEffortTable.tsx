@@ -55,12 +55,7 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
 
-const EffortTooltip = (
-  effort: LeaderboardInvitationalEffort,
-  filterMode: FilterMode,
-  allEfforts: InvitationalEffort[],
-  distance?: number
-) => {
+const EffortTooltip = (effort: LeaderboardInvitationalEffort, allEfforts: InvitationalEffort[], distance: number) => {
   const effortsReversed = [...allEfforts].reverse();
   const extraInfo = (
     <>
@@ -456,7 +451,7 @@ export const InvitationalEffortTable = () => {
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
                             <Tooltip
-                              label={EffortTooltip(invitationalEffort, filterMode, efforts, invitational.distance)}
+                              label={EffortTooltip(invitationalEffort, efforts, invitational.distance)}
                               position="left"
                             >
                               <Text color={invitationalRankColor}>
@@ -466,7 +461,7 @@ export const InvitationalEffortTable = () => {
                           </Anchor>
                         ) : (
                           <Tooltip
-                            label={EffortTooltip(invitationalEffort, filterMode, efforts, invitational.distance)}
+                            label={EffortTooltip(invitationalEffort, efforts, invitational.distance)}
                             position="left"
                           >
                             <Text color={invitationalRankColor}>
