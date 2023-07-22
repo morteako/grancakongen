@@ -55,7 +55,12 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
 
-const EffortTooltip = (effort: LeaderboardInvitationalEffort, allEfforts: InvitationalEffort[], distance: number) => {
+const EffortTooltipLabel = (props: {
+  effort: LeaderboardInvitationalEffort;
+  allEfforts: InvitationalEffort[];
+  distance: number;
+}) => {
+  const { effort, allEfforts, distance } = props;
   const effortsReversed = [...allEfforts].reverse();
   const extraInfo = (
     <>
@@ -466,7 +471,13 @@ export const InvitationalEffortTable = () => {
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
                             <Tooltip
-                              label={EffortTooltip(invitationalEffort, efforts, invitational.distance)}
+                              label={
+                                <EffortTooltipLabel
+                                  effort={invitationalEffort}
+                                  allEfforts={efforts}
+                                  distance={invitational.distance}
+                                />
+                              }
                               position="left"
                             >
                               <Text color={invitationalRankColor}>
@@ -476,7 +487,13 @@ export const InvitationalEffortTable = () => {
                           </Anchor>
                         ) : (
                           <Tooltip
-                            label={EffortTooltip(invitationalEffort, efforts, invitational.distance)}
+                            label={
+                              <EffortTooltipLabel
+                                effort={invitationalEffort}
+                                allEfforts={efforts}
+                                distance={invitational.distance}
+                              />
+                            }
                             position="left"
                           >
                             <Text color={invitationalRankColor}>
