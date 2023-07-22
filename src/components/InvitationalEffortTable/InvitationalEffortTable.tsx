@@ -222,11 +222,12 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
   return leaderboard;
 };
 
-const InvitationalTooltip = (inv: Invitational) => {
-  const distanceWith2Decimals = (inv.distance / 1000).toFixed(2);
+const InvitationalTooltipLabel = (props: { invitational: Invitational }) => {
+  const { invitational } = props;
+  const distanceWith2Decimals = (invitational.distance / 1000).toFixed(2);
   return (
     <>
-      {inv.description}
+      {invitational.description}
       <Divider style={{ width: '100%' }} />
       {distanceWith2Decimals} km
     </>
@@ -392,7 +393,11 @@ export const InvitationalEffortTable = () => {
               {invitationals.map(invitational => (
                 <th key={'invitational-' + invitational.id}>
                   <Flex justify="space-between" align="center">
-                    <Tooltip label={InvitationalTooltip(invitational)} position="bottom" fw="normal">
+                    <Tooltip
+                      label={<InvitationalTooltipLabel invitational={invitational} />}
+                      position="bottom"
+                      fw="normal"
+                    >
                       <Text style={{ textTransform: 'uppercase' }} fz="xs" fw="bolder">
                         <InvitationalTitle invitational={invitational} titleType={titleType} filterMode={filterMode} />
                       </Text>
