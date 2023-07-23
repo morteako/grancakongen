@@ -55,7 +55,12 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
 
-const EffortTooltip = (effort: LeaderboardInvitationalEffort, allEfforts: InvitationalEffort[], distance: number) => {
+const EffortTooltipLabel = (props: {
+  effort: LeaderboardInvitationalEffort;
+  allEfforts: InvitationalEffort[];
+  distance: number;
+}) => {
+  const { effort, allEfforts, distance } = props;
   const effortsReversed = [...allEfforts].reverse();
   const extraInfo = (
     <>
@@ -217,6 +222,18 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
   return leaderboard;
 };
 
+const InvitationalTooltipLabel = (props: { invitational: Invitational }) => {
+  const { invitational } = props;
+  const distanceWith2Decimals = (invitational.distance / 1000).toFixed(2);
+  return (
+    <>
+      {invitational.description}
+      <Divider style={{ width: '100%' }} />
+      {distanceWith2Decimals} km
+    </>
+  );
+};
+
 type EventAthleteEffortsMap = Map<string, Map<string, InvitationalEffort[]>>;
 
 const groupAthleteEffortsByEvent = (efforts: InvitationalEffortGroup[]): EventAthleteEffortsMap => {
@@ -376,7 +393,11 @@ export const InvitationalEffortTable = () => {
               {invitationals.map(invitational => (
                 <th key={'invitational-' + invitational.id}>
                   <Flex justify="space-between" align="center">
-                    <Tooltip label={invitational.description} position="bottom" fw="normal">
+                    <Tooltip
+                      label={<InvitationalTooltipLabel invitational={invitational} />}
+                      position="bottom"
+                      fw="normal"
+                    >
                       <Text style={{ textTransform: 'uppercase' }} fz="xs" fw="bolder">
                         <InvitationalTitle invitational={invitational} titleType={titleType} filterMode={filterMode} />
                       </Text>
@@ -455,7 +476,13 @@ export const InvitationalEffortTable = () => {
                         {invitationalEffort.effort.activity ? (
                           <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
                             <Tooltip
-                              label={EffortTooltip(invitationalEffort, efforts, invitational.distance)}
+                              label={
+                                <EffortTooltipLabel
+                                  effort={invitationalEffort}
+                                  allEfforts={efforts}
+                                  distance={invitational.distance}
+                                />
+                              }
                               position="left"
                             >
                               <Text color={invitationalRankColor}>
@@ -465,7 +492,13 @@ export const InvitationalEffortTable = () => {
                           </Anchor>
                         ) : (
                           <Tooltip
-                            label={EffortTooltip(invitationalEffort, efforts, invitational.distance)}
+                            label={
+                              <EffortTooltipLabel
+                                effort={invitationalEffort}
+                                allEfforts={efforts}
+                                distance={invitational.distance}
+                              />
+                            }
                             position="left"
                           >
                             <Text color={invitationalRankColor}>
