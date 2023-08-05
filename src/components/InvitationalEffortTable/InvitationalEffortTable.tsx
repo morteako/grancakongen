@@ -38,6 +38,7 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
       return leaderboard.sort((a, b) => {
         const aEffort = a.efforts[sortBy.invitationalId];
         const bEffort = b.efforts[sortBy.invitationalId];
+        console.log('aEffort:', aEffort);
 
         if (!aEffort && !bEffort) {
           return 0;
@@ -46,7 +47,7 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
         } else if (!aEffort && bEffort) {
           return 1;
         } else {
-          return bEffort.points - aEffort.points;
+          return aEffort.effort.duration - bEffort.effort.duration;
         }
       });
   }
