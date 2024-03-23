@@ -7,19 +7,19 @@ export const useFilterMode = () => {
   const { search } = useLocation();
   const urlParams = new URLSearchParams(search);
 
-  const defaultYear2023Mode: FilterMode = { type: 'year', year: 2023 };
-  const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2023Mode);
+  const defaultYear2024Mode: FilterMode = { type: 'year', year: 2023 };
+  const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2024Mode);
 
   const history = useHistory();
 
   const setFilterModeFromSelector = (string: string | null, segmentNames: string[]) => {
-    const newFilterMode = parseFromSelect(string, segmentNames) || defaultYear2023Mode;
+    const newFilterMode = parseFromSelect(string, segmentNames) || defaultYear2024Mode;
     setFilterMode(newFilterMode);
     history.push({ search: encodeToParams(newFilterMode) });
   };
 
   const setFilterModeFromQuery = () => {
-    setFilterMode(parseFromParams(urlParams) || defaultYear2023Mode);
+    setFilterMode(parseFromParams(urlParams) || defaultYear2024Mode);
   };
 
   return { filterMode, setFilterModeFromSelector, setFilterModeFromQuery };
@@ -77,4 +77,5 @@ const years = {
   '2021': 2021,
   '2022': 2022,
   '2023': 2023,
+  '2024': 2024,
 } as Record<string, number>;

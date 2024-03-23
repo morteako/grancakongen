@@ -340,6 +340,7 @@ export const InvitationalEffortTable = () => {
             }}
             value={displayFilterMode(filterMode)}
             data={[
+              { value: '2024', label: '2024', group: 'Year' },
               { value: '2023', label: '2023', group: 'Year' },
               { value: '2022', label: '2022', group: 'Year' },
               { value: '2021', label: '2021', group: 'Year' },
