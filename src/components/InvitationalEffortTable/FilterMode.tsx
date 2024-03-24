@@ -7,7 +7,7 @@ export const useFilterMode = () => {
   const { search } = useLocation();
   const urlParams = new URLSearchParams(search);
 
-  const defaultYear2024Mode: FilterMode = { type: 'year', year: 2023 };
+  const defaultYear2024Mode: FilterMode = { type: 'year', year: 2024 };
   const [filterMode, setFilterMode] = useState<FilterMode>(defaultYear2024Mode);
 
   const history = useHistory();
