@@ -280,6 +280,8 @@ const dedupInvitationalsAlltime = (invitationals: InvitationalEffortGroup[]) => 
   return Array.from(uniqueInvitationalNames.values());
 };
 
+type DataDisplay = 'duration' | 'pace';
+
 export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
   const [allTimeLeaderboard, setAllTimeLeaderboard] = React.useState(new Map() as EventAthleteEffortsMap);
@@ -313,6 +315,7 @@ export const InvitationalEffortTable = () => {
   }, [efforts, filterMode]);
 
   const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
+  const [dataDisplay, setDataDisplay] = useState('duration' as DataDisplay);
 
   const sortedLeaderboard = sortBy.inverted
     ? sortLeaderboard(leaderboard, sortBy).reverse()
@@ -329,7 +332,7 @@ export const InvitationalEffortTable = () => {
 
   return (
     <Stack>
-      <Flex justify="center">
+      <Flex justify="center" gap={'10px'}>
         <Box maw="500px">
           <Select
             onChange={value => {
@@ -347,6 +350,20 @@ export const InvitationalEffortTable = () => {
               { value: '2020', label: '2020', group: 'Year' },
               { value: 'alltime', label: 'All-time', group: 'Other' },
               ...racesSelectData,
+            ]}
+          />
+        </Box>
+        <Box maw="500px">
+          <Select
+            onChange={value => {
+              if (value === 'duration' || value === 'pace') {
+                setDataDisplay(value);
+              }
+            }}
+            value={dataDisplay}
+            data={[
+              { value: 'duration', label: 'Duration' },
+              { value: 'pace', label: 'Pace' },
             ]}
           />
         </Box>
@@ -473,6 +490,15 @@ export const InvitationalEffortTable = () => {
                         ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
                         : undefined;
 
+                    const getMetricToDisplay = () => {
+                      switch (dataDisplay) {
+                        case 'duration':
+                          return getDurationInMMSS(invitationalEffort.effort) + prTag;
+                        case 'pace':
+                          return calculatePace(invitationalEffort.effort.duration, invitational.distance, '') + prTag;
+                      }
+                    };
+
                     return (
                       <td key={athlete.profile + '-seg-' + i}>
                         {invitationalEffort.effort.activity ? (
@@ -487,9 +513,7 @@ export const InvitationalEffortTable = () => {
                               }
                               position="left"
                             >
-                              <Text color={invitationalRankColor}>
-                                {getDurationInMMSS(invitationalEffort.effort) + prTag}
-                              </Text>
+                              <Text color={invitationalRankColor}>{getMetricToDisplay()}</Text>
                             </Tooltip>
                           </Anchor>
                         ) : (
@@ -503,9 +527,7 @@ export const InvitationalEffortTable = () => {
                             }
                             position="left"
                           >
-                            <Text color={invitationalRankColor}>
-                              {getDurationInMMSS(invitationalEffort.effort) + prTag}
-                            </Text>
+                            <Text color={invitationalRankColor}>{getMetricToDisplay()}</Text>
                           </Tooltip>
                         )}
                       </td>
@@ -559,10 +581,10 @@ const getDurationInMMSS = (effort: InvitationalEffort) => {
   return `${minutes}:${secondsPadding}${seconds}`;
 };
 
-const calculatePace = (durationInSec: number, distanceInMeters: number) => {
+const calculatePace = (durationInSec: number, distanceInMeters: number, postfix: string = '/km') => {
   const secPerKM = (durationInSec * 1000) / distanceInMeters;
   const minutes = Math.floor(secPerKM / 60);
   const seconds = Math.floor(secPerKM % 60);
   const secondsPadding = seconds < 10 ? '0' : '';
-  return `${minutes}:${secondsPadding}${seconds}/km`;
+  return `${minutes}:${secondsPadding}${seconds}${postfix}`;
 };
