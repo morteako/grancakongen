@@ -28,10 +28,10 @@ const polishEfforts = (efforts: ClubEffortsFromApi): ClubEfforts => {
 };
 
 const parseDuration = (duration: string) => {
-  const [mins, secs] = duration.split(':');
+  const [mins, secsWithPossibleDecimals] = duration.split(':');
   try {
     const minsInSeconds = parseInt(mins, 10);
-    const seconds = parseInt(secs, 10);
+    const seconds = parseFloat(secsWithPossibleDecimals);
     return minsInSeconds * 60 + seconds;
   } catch {
     return null;
