@@ -87,14 +87,15 @@ const EffortTooltipLabel = (props: {
 
 const PointsTooltipLabel = (props: { athlete: InvitationalAthlete; invitationals: Invitational[] }) => {
   const { athlete, invitationals } = props;
+  const style = { color: 'black' };
   return (
     <Stack spacing="xs" align="center">
-      <table>
+      <Table fontSize="xs" style={style}>
         <thead>
           <tr>
-            <th>Race</th>
-            <th>#</th>
-            <th>PTS</th>
+            <th style={style}>Race</th>
+            <th style={style}>#</th>
+            <th style={style}>PTS</th>
           </tr>
         </thead>
         <tbody>
@@ -106,7 +107,7 @@ const PointsTooltipLabel = (props: { athlete: InvitationalAthlete; invitationals
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </Stack>
   );
 };
