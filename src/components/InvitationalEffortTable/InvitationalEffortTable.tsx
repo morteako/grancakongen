@@ -84,6 +84,33 @@ const EffortTooltipLabel = (props: {
     </Stack>
   );
 };
+
+const PointsTooltipLabel = (props: { athlete: InvitationalAthlete; invitationals: Invitational[] }) => {
+  const { athlete, invitationals } = props;
+  return (
+    <Stack spacing="xs" align="center">
+      <table>
+        <thead>
+          <tr>
+            <th>Race</th>
+            <th>#</th>
+            <th>PTS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(athlete.efforts).map(([invitationalId, curEffort]) => (
+            <tr key={invitationalId}>
+              <td>{invitationals.find(inv => inv.id === invitationalId)?.name || invitationalId}</td>
+              <td>{curEffort.effort.localRank}</td>
+              <td>{curEffort.points} PTS</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Stack>
+  );
+};
+
 const getInvitationalIcon = (sortBy: SortBy, invitationalId: string) =>
   sortBy.type === 'invitational' && sortBy.invitationalId === invitationalId ? (
     sortBy.inverted ? (
@@ -459,9 +486,14 @@ export const InvitationalEffortTable = () => {
                       <Text display="inline" fw="bold" color={rankColor}>
                         {athlete.rank}
                       </Text>
-                      <Text display="inline" color={rankColor}>
-                        {athlete.totalPoints}
-                      </Text>
+                      <Tooltip
+                        label={<PointsTooltipLabel athlete={athlete} invitationals={invitationals} />}
+                        position="right"
+                      >
+                        <Text display="inline" color={rankColor}>
+                          {athlete.totalPoints}
+                        </Text>
+                      </Tooltip>
                     </Flex>
                   </td>
                   <td>
