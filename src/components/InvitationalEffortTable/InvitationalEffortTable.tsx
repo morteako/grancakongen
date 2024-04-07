@@ -28,14 +28,18 @@ type SortBy =
       invitationalId: string;
     };
 
-const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => {
+const sortLeaderboard = (unclonedLeaderboard: InvitationalAthlete[], sortBy: SortBy): InvitationalAthlete[] => {
+  let clonedLeaderboard = [...unclonedLeaderboard];
+  let sortedLeaderboard: InvitationalAthlete[];
   switch (sortBy.type) {
     case 'name':
-      return leaderboard.sort((a, b) => a.name.localeCompare(b.name));
+      sortedLeaderboard = clonedLeaderboard.sort((a, b) => a.name.localeCompare(b.name));
+      break;
     case 'rank':
-      return leaderboard.sort((a, b) => a.rank - b.rank);
+      sortedLeaderboard = clonedLeaderboard.sort((a, b) => a.rank - b.rank);
+      break;
     case 'invitational':
-      return leaderboard.sort((a, b) => {
+      sortedLeaderboard = clonedLeaderboard.sort((a, b) => {
         const aEffort = a.efforts[sortBy.invitationalId];
         const bEffort = b.efforts[sortBy.invitationalId];
         console.log('aEffort:', aEffort);
@@ -50,7 +54,9 @@ const sortLeaderboard = (leaderboard: InvitationalAthlete[], sortBy: SortBy) => 
           return aEffort.effort.duration - bEffort.effort.duration;
         }
       });
+      break;
   }
+  return sortBy.inverted ? sortedLeaderboard.reverse() : sortedLeaderboard;
 };
 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
@@ -308,7 +314,7 @@ const dedupInvitationalsAlltime = (invitationals: InvitationalEffortGroup[]) => 
   return Array.from(uniqueInvitationalNames.values());
 };
 
-type DataDisplay = 'duration' | 'pace';
+type DataDisplay = 'duration' | 'pace' | 'behindWinner';
 
 export const InvitationalEffortTable = () => {
   const [leaderboard, setLeaderboard] = React.useState([] as InvitationalAthlete[]);
@@ -320,18 +326,18 @@ export const InvitationalEffortTable = () => {
 
   const { filterMode, setFilterModeFromSelector, setFilterModeFromQuery } = useFilterMode();
 
-  const { efforts } = useEfforts();
+  const { efforts: allEfforts } = useEfforts();
 
   React.useEffect(() => {
     setFilterModeFromQuery();
   }, []);
 
   React.useEffect(() => {
-    if (efforts) {
-      const relevantInvitationals = getRelevantInvitationals(efforts, filterMode);
+    if (allEfforts) {
+      const relevantInvitationals = getRelevantInvitationals(allEfforts, filterMode);
       const leaderboard = calculateLeaderboard(relevantInvitationals, filterMode);
       setLeaderboard(leaderboard);
-      setAllTimeLeaderboard(groupAthleteEffortsByEvent(efforts.invitationalEfforts));
+      setAllTimeLeaderboard(groupAthleteEffortsByEvent(allEfforts.invitationalEfforts));
 
       const invitationals = dedupInvitationals(
         relevantInvitationals.map(effort => effort.invitational),
@@ -340,19 +346,17 @@ export const InvitationalEffortTable = () => {
 
       setInvitationals(invitationals);
     }
-  }, [efforts, filterMode]);
+  }, [allEfforts, filterMode]);
 
   const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
   const [dataDisplay, setDataDisplay] = useState('duration' as DataDisplay);
 
-  const sortedLeaderboard = sortBy.inverted
-    ? sortLeaderboard(leaderboard, sortBy).reverse()
-    : sortLeaderboard(leaderboard, sortBy);
+  const sortedLeaderboard = sortLeaderboard(leaderboard, sortBy);
 
   const colorStrength = 6;
   const medalColors = ['yellow', 'gray', 'orange'];
 
-  const racesSelectData = dedupInvitationalsAlltime(efforts?.invitationalEfforts || []).map(i => ({
+  const racesSelectData = dedupInvitationalsAlltime(allEfforts?.invitationalEfforts || []).map(i => ({
     value: i.invitational.name,
     label: i.invitational.name,
     group: 'Races',
@@ -384,7 +388,7 @@ export const InvitationalEffortTable = () => {
         <Box maw="500px">
           <Select
             onChange={value => {
-              if (value === 'duration' || value === 'pace') {
+              if (value === 'duration' || value === 'pace' || value == 'behindWinner') {
                 setDataDisplay(value);
               }
             }}
@@ -392,6 +396,7 @@ export const InvitationalEffortTable = () => {
             data={[
               { value: 'duration', label: 'Duration' },
               { value: 'pace', label: 'Pace' },
+              { value: 'behindWinner', label: '% Behind winner' },
             ]}
           />
         </Box>
@@ -501,7 +506,7 @@ export const InvitationalEffortTable = () => {
                     <Anchor href={`http://www.strava.com${athlete.profile}`}>
                       <Tooltip label={athlete.name} position="left">
                         <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                          {getDisplayedName(athlete, efforts?.invitationalEfforts)}
+                          {getDisplayedName(athlete, allEfforts?.invitationalEfforts)}
                         </Text>
                       </Tooltip>
                     </Anchor>
@@ -523,12 +528,14 @@ export const InvitationalEffortTable = () => {
                         ? `${medalColors[invitationalRank - 1]}.${colorStrength}`
                         : undefined;
 
-                    const getMetricToDisplay = () => {
+                    const getMetricToDisplay: () => string = () => {
                       switch (dataDisplay) {
                         case 'duration':
                           return getDurationInMMSS(invitationalEffort.effort) + prTag;
                         case 'pace':
                           return calculatePace(invitationalEffort.effort.duration, invitational.distance, '') + prTag;
+                        case 'behindWinner':
+                          return calculatePctBehindWinner(invitationalEffort.effort, invitational.id, allEfforts);
                       }
                     };
 
@@ -620,4 +627,19 @@ const calculatePace = (durationInSec: number, distanceInMeters: number, postfix:
   const seconds = Math.floor(secPerKM % 60);
   const secondsPadding = seconds < 10 ? '0' : '';
   return `${minutes}:${secondsPadding}${seconds}${postfix}`;
+};
+
+const calculatePctBehindWinner = (
+  currentEffort: InvitationalEffort,
+  invitationalId: string,
+  efforts: ClubEfforts | undefined
+) => {
+  if (!efforts) {
+    return '';
+  }
+  const effortsForInvitational =
+    efforts.invitationalEfforts.find(effort => effort.invitational.id === invitationalId)?.efforts || [];
+  const winningTime = Math.min(...effortsForInvitational.map(effort => effort.duration));
+  const pctBehindWinner = (currentEffort.duration / winningTime - 1) * 100;
+  return `${pctBehindWinner.toFixed(1)}%`;
 };
