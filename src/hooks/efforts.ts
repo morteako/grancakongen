@@ -14,14 +14,14 @@ const polishEfforts = (efforts: ClubEffortsFromApi): ClubEfforts => {
   return {
     ...efforts,
     invitationalEfforts: efforts.invitationalEfforts.map(invEffort => ({
-      ...invEffort,
+      invitational: invEffort.invitational,
       efforts: invEffort.efforts.map(effort => {
         let durationInSeconds = parseDuration(effort.duration);
         if (durationInSeconds == null) {
           console.error(`Invalid duration: ${effort.duration}`);
-          return { ...effort, duration: 1000069420 };
+          return { ...effort, invitational: invEffort.invitational, duration: 1000069420 };
         }
-        return { ...effort, duration: durationInSeconds };
+        return { ...effort, invitational: invEffort.invitational, duration: durationInSeconds };
       }),
     })),
   };

@@ -63,18 +63,18 @@ const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
 
 const EffortTooltipLabel = (props: {
-  effort: LeaderboardInvitationalEffort;
+  leaderboardEffort: LeaderboardInvitationalEffort;
   allEfforts: InvitationalEffort[];
   distance: number;
 }) => {
-  const { effort, allEfforts, distance } = props;
+  const { leaderboardEffort, allEfforts, distance } = props;
   const effortsReversed = [...allEfforts].reverse();
   const extraInfo = (
     <>
       <Divider style={{ width: '100%' }} />
       {effortsReversed.map((curEffort, i) => (
         <Text key={curEffort.activity + i}>
-          {curEffort.year}: {getDurationInMMSS(curEffort)}
+          {curEffort.invitational.year}: {getDurationInMMSS(curEffort)}
           {distance && ` (${calculatePace(curEffort.duration, distance)})`}
         </Text>
       ))}
@@ -83,8 +83,8 @@ const EffortTooltipLabel = (props: {
   return (
     <Stack spacing="xs" align="flex-start">
       <Text>
-        {effort.effort.year === undefined ? '' : `${effort.effort.year}: `}
-        Rank: {effort.effort.localRank} – Points: {effort.points}
+        {`${leaderboardEffort.effort.invitational.year}: `}
+        Rank: {leaderboardEffort.effort.localRank} – Points: {leaderboardEffort.points}
       </Text>
       {extraInfo}
     </Stack>
@@ -289,9 +289,9 @@ const groupAthleteEffortsByEvent = (efforts: InvitationalEffortGroup[]): EventAt
     inviEfforts.efforts.forEach(effort => {
       const currentPersonBestEfforts = eventMap.get(effort.name);
       if (currentPersonBestEfforts === undefined) {
-        eventMap.set(effort.name, [{ ...effort, year: inviEfforts.invitational.year }]);
+        eventMap.set(effort.name, [effort]);
       } else {
-        eventMap.set(effort.name, [...currentPersonBestEfforts, { ...effort, year: inviEfforts.invitational.year }]);
+        eventMap.set(effort.name, [...currentPersonBestEfforts, effort]);
       }
     });
   });
@@ -535,7 +535,7 @@ export const InvitationalEffortTable = () => {
                         case 'pace':
                           return calculatePace(invitationalEffort.effort.duration, invitational.distance, '') + prTag;
                         case 'behindWinner':
-                          return calculatePctBehindWinner(invitationalEffort.effort, invitational.id, allEfforts);
+                          return calculatePctBehindWinner(invitationalEffort.effort, allEfforts);
                       }
                     };
 
@@ -546,7 +546,7 @@ export const InvitationalEffortTable = () => {
                             <Tooltip
                               label={
                                 <EffortTooltipLabel
-                                  effort={invitationalEffort}
+                                  leaderboardEffort={invitationalEffort}
                                   allEfforts={efforts}
                                   distance={invitational.distance}
                                 />
@@ -560,7 +560,7 @@ export const InvitationalEffortTable = () => {
                           <Tooltip
                             label={
                               <EffortTooltipLabel
-                                effort={invitationalEffort}
+                                leaderboardEffort={invitationalEffort}
                                 allEfforts={efforts}
                                 distance={invitational.distance}
                               />
@@ -629,17 +629,14 @@ const calculatePace = (durationInSec: number, distanceInMeters: number, postfix:
   return `${minutes}:${secondsPadding}${seconds}${postfix}`;
 };
 
-const calculatePctBehindWinner = (
-  currentEffort: InvitationalEffort,
-  invitationalId: string,
-  efforts: ClubEfforts | undefined
-) => {
+const calculatePctBehindWinner = (currentEffort: InvitationalEffort, efforts: ClubEfforts | undefined) => {
   if (!efforts) {
     return '';
   }
   const effortsForInvitational =
-    efforts.invitationalEfforts.find(effort => effort.invitational.id === invitationalId)?.efforts || [];
+    efforts.invitationalEfforts.find(effort => effort.invitational.id === currentEffort.invitational.id)?.efforts || [];
   const winningTime = Math.min(...effortsForInvitational.map(effort => effort.duration));
+  // subtract 1 to go from f.ex 121% to 21%
   const pctBehindWinner = (currentEffort.duration / winningTime - 1) * 100;
   return `${pctBehindWinner.toFixed(1)}%`;
 };
