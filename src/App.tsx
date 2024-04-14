@@ -21,7 +21,7 @@ export const App = () => {
           <BrowserRouter>
             <Switch>
               <Route exact path="/">
-                <InvitationalEffortTable />
+                <InvitationalEffortTable allEfforts={efforts} />
               </Route>
               <Route path="/beermile">
                 <Beermile />

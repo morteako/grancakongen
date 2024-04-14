@@ -4,7 +4,7 @@ export interface InvitationalEffort {
   activity: string;
   duration: number;
   localRank?: number;
-  year?: number;
+  invitational: Invitational;
 }
 
 export interface InvitationalEffortFromApi {
