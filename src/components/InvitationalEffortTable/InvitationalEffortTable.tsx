@@ -258,11 +258,20 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
 const InvitationalTooltipLabel = (props: { invitational: Invitational }) => {
   const { invitational } = props;
   const distanceWith2Decimals = (invitational.distance / 1000).toFixed(2);
+
+  const getInfoText = () => {
+    if (!invitational.elevation) {
+      return `${distanceWith2Decimals} km`;
+    }
+    const avgGradient = (100 * invitational.elevation) / invitational.distance;
+    return `${distanceWith2Decimals} km - 🏔️${invitational.elevation} m - 📈${avgGradient.toFixed(1)} %`;
+  };
+
   return (
     <>
       {invitational.description}
       <Divider style={{ width: '100%' }} />
-      {distanceWith2Decimals} km
+      {getInfoText()}
     </>
   );
 };
