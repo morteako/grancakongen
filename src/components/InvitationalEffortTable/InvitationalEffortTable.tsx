@@ -264,7 +264,7 @@ const InvitationalTooltipLabel = (props: { invitational: Invitational }) => {
       return `${distanceWith2Decimals} km`;
     }
     const avgGradient = (100 * invitational.elevation) / invitational.distance;
-    return `${distanceWith2Decimals} km - 🏔️${invitational.elevation} m - 📈${avgGradient.toFixed(1)} %`;
+    return `${distanceWith2Decimals} km - ${invitational.elevation} m - ${avgGradient.toFixed(1)} %`;
   };
 
   return (
