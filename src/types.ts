@@ -25,6 +25,7 @@ export interface Invitational {
   type: 'minor' | 'major';
   year: number;
   distance: number;
+  elevation?: number;
 }
 
 export interface Club {
