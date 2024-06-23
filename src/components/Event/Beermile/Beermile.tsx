@@ -3,10 +3,10 @@ import { Center, Stack, Title, Text, Anchor } from '@mantine/core';
 const Beermile = () => {
   return (
     <Center>
-      <Stack px="sm" mb="sm" maw="700px">
+      <Stack px="sm" mb="xl" maw="700px">
         <Stack>
-          <Title>BEER MILE 2023</Title>
-          <Text fw="bold">Lørdag 5. august 2023 kl 16:00 – ved Institutt for informatikk (Gaustad)</Text>
+          <Title>BEER MILE 2024</Title>
+          <Text fw="bold">Lørdag 3. august 2024 kl 16:00 på Voldsløkka</Text>
           <Title order={2}>Regler</Title>
 
           <Text>
@@ -63,12 +63,16 @@ const Beermile = () => {
           </Text>
           <Title>Løypekart</Title>
           <Text>
-            Vi løper [mest sannsynlig] ved Institutt for informatikk (Gaustadalléen 23B) – der er det ganske flatt,
-            asfalt og gode publikumsmuligheter, eller på Voldsløkka. Vi skulle gjerne ha løpt på bane for optimal løype,
-            men vi tviler på at vi klarer å arrangere det på en forsvarlig måte. Vi har alternativer til vurdering, men
-            vi tar gjerne mot flere forslag!
+            Vi kjører samme løype som i fjor; en liten runde på Voldsløkka – der er det ganske flatt, asfalt og gode
+            publikumsmuligheter. Vi skulle gjerne ha løpt på bane for optimal løype, men vi tviler på at vi klarer å
+            arrangere det på en forsvarlig måte.
           </Text>
-          <Text>Løypekaret vil være tilgjengelig her senest kl 10:00 på løpsdagen.</Text>
+          <Text>
+            <Anchor href="https://www.strava.com/routes/3121835459857184188" color="orange">
+              Se løypekartet på Strava
+            </Anchor>{' '}
+            – Vi løper denne runden fire ganger
+          </Text>
         </Stack>
       </Stack>
     </Center>
