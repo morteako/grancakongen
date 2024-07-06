@@ -12,21 +12,21 @@ export const useDataDisplay = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const setDataDisplayFromSelector = (string: string | null) => {
-    const newDataDisplay = parse(string) || defaultDuration;
+    const newDataDisplay = parseUrlParam(string) || defaultDuration;
     setDataDisplay(newDataDisplay);
     searchParams.set(dataDisplayUrlParam, newDataDisplay);
     setSearchParams(searchParams);
   };
   const setDataDisplayFromQuery = () => {
     const filter = searchParams.get(dataDisplayUrlParam);
-    setDataDisplay(parse(filter) || defaultDuration);
+    setDataDisplay(parseUrlParam(filter) || defaultDuration);
   };
 
   return { dataDisplay, setDataDisplayFromSelector, setDataDisplayFromQuery };
 };
 
-const parse = (str: string | null): DataDisplay | null => {
-  switch (str) {
+const parseUrlParam = (key: string | null): DataDisplay | null => {
+  switch (key) {
     case 'duration':
       return 'duration';
     case 'pace':

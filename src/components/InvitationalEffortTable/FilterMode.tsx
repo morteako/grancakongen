@@ -12,14 +12,14 @@ export const useFilterMode = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const setFilterModeFromSelector = (string: string | null, segmentNames: string[]) => {
-    const newFilterMode = parse(string, segmentNames) || defaultYear2024Mode;
+    const newFilterMode = parseUrlParam(string, segmentNames) || defaultYear2024Mode;
     setFilterMode(newFilterMode);
     searchParams.set(filterModeUrlParam, filterModeToString(newFilterMode));
     setSearchParams(searchParams);
   };
   const setFilterModeFromQuery = (segmentNames: string[]) => {
     const filter = searchParams.get(filterModeUrlParam);
-    setFilterMode(parse(filter, segmentNames) || defaultYear2024Mode);
+    setFilterMode(parseUrlParam(filter, segmentNames) || defaultYear2024Mode);
   };
 
   return { filterMode, setFilterModeFromSelector, setFilterModeFromQuery };
@@ -36,15 +36,15 @@ export const filterModeToString = (filterMode: FilterMode): string => {
   }
 };
 
-const parse = (string: string | null, segmentNames: string[]): FilterMode | null => {
-  if (string === null) return null;
-  if (string === 'alltime') return { type: 'alltime' };
-  if (years[string]) return { type: 'year', year: years[string] };
-  if (segmentNames.includes(string)) return { type: 'race', name: string };
+const parseUrlParam = (key: string | null, segmentNames: string[]): FilterMode | null => {
+  if (key === null) return null;
+  if (key === 'alltime') return { type: 'alltime' };
+  if (years[key]) return { type: 'year', year: years[key] };
+  if (segmentNames.includes(key)) return { type: 'race', name: key };
   return null;
 };
 
-const years = {
+export const years = {
   '2020': 2020,
   '2021': 2021,
   '2022': 2022,

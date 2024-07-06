@@ -10,7 +10,7 @@ import {
 } from '../../types';
 import { ActionIcon, Anchor, Box, Divider, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
-import { filterModeToString, FilterMode, useFilterMode } from './FilterMode';
+import { filterModeToString, FilterMode, useFilterMode, years } from './FilterMode';
 import { DataDisplay, useDataDisplay } from './DataDisplay';
 
 type SortBy =
@@ -365,8 +365,16 @@ export const InvitationalEffortTable = (props: Props) => {
   const racesSelectData = dedupInvitationalsAlltime(allEfforts.invitationalEfforts).map(i => ({
     value: i.invitational.name,
     label: i.invitational.name,
-    group: 'Races',
+    group: 'Race',
   }));
+
+  const yearsSelectData = Object.keys(years)
+    .toSorted((a, b) => b.localeCompare(a))
+    .map(year => ({
+      value: year,
+      label: year,
+      group: 'Year',
+    }));
 
   const segmentNames = racesSelectData.map(race => race.value);
 
@@ -379,15 +387,7 @@ export const InvitationalEffortTable = (props: Props) => {
               setFilterModeFromSelector(value, segmentNames);
             }}
             value={filterModeToString(filterMode)}
-            data={[
-              { value: '2024', label: '2024', group: 'Year' },
-              { value: '2023', label: '2023', group: 'Year' },
-              { value: '2022', label: '2022', group: 'Year' },
-              { value: '2021', label: '2021', group: 'Year' },
-              { value: '2020', label: '2020', group: 'Year' },
-              { value: 'alltime', label: 'All-time', group: 'Other' },
-              ...racesSelectData,
-            ]}
+            data={[{ value: 'alltime', label: 'All-time', group: 'Other' }, ...yearsSelectData, ...racesSelectData]}
           />
         </Box>
         <Box maw="500px">
