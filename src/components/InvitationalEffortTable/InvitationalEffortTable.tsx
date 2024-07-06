@@ -10,7 +10,8 @@ import {
 } from '../../types';
 import { ActionIcon, Anchor, Box, Divider, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
-import { displayFilterMode, FilterMode, useFilterMode } from './FilterMode';
+import { filterModeToString, FilterMode, useFilterMode } from './FilterMode';
+import { DataDisplay, useDataDisplay } from './DataDisplay';
 
 type SortBy =
   | {
@@ -321,8 +322,6 @@ const dedupInvitationalsAlltime = (invitationals: InvitationalEffortGroup[]) => 
   return Array.from(uniqueInvitationalNames.values());
 };
 
-type DataDisplay = 'duration' | 'pace' | 'behindWinner';
-
 type Props = { allEfforts: ClubEfforts };
 
 export const InvitationalEffortTable = (props: Props) => {
@@ -335,10 +334,7 @@ export const InvitationalEffortTable = (props: Props) => {
   const titleType: TitleType = width < 700 ? 'initials' : width < 1200 ? 'short' : 'full';
 
   const { filterMode, setFilterModeFromSelector, setFilterModeFromQuery } = useFilterMode();
-
-  React.useEffect(() => {
-    setFilterModeFromQuery();
-  }, []);
+  const { dataDisplay, setDataDisplayFromSelector, setDataDisplayFromQuery } = useDataDisplay();
 
   React.useEffect(() => {
     const relevantInvitationals = getRelevantInvitationals(allEfforts, filterMode);
@@ -354,8 +350,12 @@ export const InvitationalEffortTable = (props: Props) => {
     setInvitationals(invitationals);
   }, [allEfforts, filterMode]);
 
+  React.useEffect(() => {
+    setFilterModeFromQuery(segmentNames);
+    setDataDisplayFromQuery();
+  }, []);
+
   const [sortBy, setSortBy] = useState({ type: 'rank' } as SortBy);
-  const [dataDisplay, setDataDisplay] = useState('duration' as DataDisplay);
 
   const sortedLeaderboard = sortLeaderboard(leaderboard, sortBy);
 
@@ -368,18 +368,17 @@ export const InvitationalEffortTable = (props: Props) => {
     group: 'Races',
   }));
 
+  const segmentNames = racesSelectData.map(race => race.value);
+
   return (
     <Stack>
       <Flex justify="center" gap={'10px'}>
         <Box maw="500px">
           <Select
             onChange={value => {
-              setFilterModeFromSelector(
-                value,
-                racesSelectData.map(s => s.value)
-              );
+              setFilterModeFromSelector(value, segmentNames);
             }}
-            value={displayFilterMode(filterMode)}
+            value={filterModeToString(filterMode)}
             data={[
               { value: '2024', label: '2024', group: 'Year' },
               { value: '2023', label: '2023', group: 'Year' },
@@ -395,7 +394,7 @@ export const InvitationalEffortTable = (props: Props) => {
           <Select
             onChange={value => {
               if (value === 'duration' || value === 'pace' || value == 'behindWinner') {
-                setDataDisplay(value);
+                setDataDisplayFromSelector(value);
               }
             }}
             value={dataDisplay}
