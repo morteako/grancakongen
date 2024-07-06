@@ -1,6 +1,6 @@
 import { InvitationalEffortTable } from './components/InvitationalEffortTable/InvitationalEffortTable';
 import { Logo } from './Logo';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { BackgroundGraphics } from './BackgroundGraphics';
 import Beermile from './components/Event/Beermile/Beermile';
 import useEfforts from './hooks/efforts';
@@ -19,18 +19,12 @@ export const App = () => {
         </Center>
         {efforts ? (
           <BrowserRouter>
-            <Switch>
-              <Route exact path="/">
-                <InvitationalEffortTable allEfforts={efforts} />
-              </Route>
-              <Route path="/beermile">
-                <Beermile />
-              </Route>
-              <Route path="/admin">
-                <Admin />
-              </Route>
-              <Route path="*" render={() => <Redirect to="/" />} />
-            </Switch>
+            <Routes>
+              <Route path="/" element={<InvitationalEffortTable allEfforts={efforts} />} />
+              <Route path="/beermile" element={<Beermile />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="*" element={<Navigate to={'/'} replace />} />
+            </Routes>
           </BrowserRouter>
         ) : (
           <Center>
