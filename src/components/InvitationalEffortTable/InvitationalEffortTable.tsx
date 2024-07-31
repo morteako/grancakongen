@@ -28,6 +28,9 @@ type SortBy =
       invitationalId: string;
     };
 
+const athleteToUniqueKey = (athlete: { profile: string; name: string }) =>
+  `${athlete.profile}-${athlete.name.split(' ').join('')}`;
+
 const sortLeaderboard = (unclonedLeaderboard: InvitationalAthlete[], sortBy: SortBy): InvitationalAthlete[] => {
   let clonedLeaderboard = [...unclonedLeaderboard];
   let sortedLeaderboard: InvitationalAthlete[];
@@ -208,7 +211,7 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
   filteredEfforts.forEach(invitationalEffort =>
     invitationalEffort.efforts.forEach(
       effort =>
-        (athletes[effort.profile] = {
+        (athletes[athleteToUniqueKey(effort)] = {
           name: effort.name,
           profile: effort.profile,
           efforts: {},
@@ -227,7 +230,7 @@ const calculateLeaderboard = (invitationalEfforts: InvitationalEffortGroup[], fi
       const scoreByRank = calculateScoreByRank(rank);
       const score = isMajor ? scoreByRank : Math.max(scoreByRank / 2, 1);
 
-      return (athletes[effort.profile].efforts[invitationalEffort.invitational.id] = {
+      return (athletes[athleteToUniqueKey(effort)].efforts[invitationalEffort.invitational.id] = {
         points: score,
         effort: { ...effort, localRank: rank + 1 },
       });
@@ -491,7 +494,7 @@ export const InvitationalEffortTable = (props: Props) => {
               const rankColor = athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined;
 
               return (
-                <tr key={athlete.profile}>
+                <tr key={athlete.profile + athlete.name.split(' ').join('')}>
                   <td>
                     <Flex justify="space-between">
                       <Text display="inline" fw="bold" color={rankColor}>
