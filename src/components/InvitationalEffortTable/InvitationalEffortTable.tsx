@@ -492,6 +492,13 @@ export const InvitationalEffortTable = (props: Props) => {
           <tbody>
             {sortedLeaderboard.map(athlete => {
               const rankColor = athlete.rank <= 3 ? `${medalColors[athlete.rank - 1]}.${colorStrength}` : undefined;
+              const Name = (
+                <Tooltip label={athlete.name} position="left">
+                  <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                    {getDisplayedName(athlete, allEfforts.invitationalEfforts)}
+                  </Text>
+                </Tooltip>
+              );
 
               return (
                 <tr key={athlete.profile + athlete.name.split(' ').join('')}>
@@ -511,13 +518,7 @@ export const InvitationalEffortTable = (props: Props) => {
                     </Flex>
                   </td>
                   <td>
-                    <Anchor href={`http://www.strava.com${athlete.profile}`}>
-                      <Tooltip label={athlete.name} position="left">
-                        <Text sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                          {getDisplayedName(athlete, allEfforts.invitationalEfforts)}
-                        </Text>
-                      </Tooltip>
-                    </Anchor>
+                    {athlete.profile ? <Anchor href={`http://www.strava.com${athlete.profile}`}>{Name}</Anchor> : Name}
                   </td>
                   {invitationals.map((invitational, i) => {
                     const invitationalEffort = athlete.efforts[invitational.id];
