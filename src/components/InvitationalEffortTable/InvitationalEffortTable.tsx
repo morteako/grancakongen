@@ -350,7 +350,7 @@ export const InvitationalEffortTable = (props: Props) => {
       filterMode
     );
 
-    setInvitationals(invitationals);
+    setInvitationals(getInvitationalsInOrder(invitationals, filterMode));
   }, [allEfforts, filterMode]);
 
   React.useEffect(() => {
@@ -593,6 +593,26 @@ export const InvitationalEffortTable = (props: Props) => {
       </Box>
     </Stack>
   );
+};
+
+const getInvitationalsInOrder = (invitationals: Invitational[], filterMode: FilterMode) => {
+  // For non alltime mode, just use the order from the backend, which should be ordered by event date
+  if (filterMode.type !== 'alltime') return invitationals;
+
+  const order = [
+    'Grefsenkollen opp',
+    'Voksen skog',
+    'Tryvann',
+    'Ullevålseter',
+    'Beer mile',
+    '5000m',
+    '3000m',
+    '1500m',
+    'Wyller',
+    'Voksen skog EXTREME',
+  ];
+
+  return invitationals.toSorted((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
 };
 
 const getPrTag = (filterMode: FilterMode, efforts: InvitationalEffort[], duration: number) => {
