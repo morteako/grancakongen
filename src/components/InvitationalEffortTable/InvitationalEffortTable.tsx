@@ -11,7 +11,9 @@ import {
 import { ActionIcon, Anchor, Box, Divider, Flex, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useViewportSize } from '@mantine/hooks';
 import { filterModeToString, FilterMode, useFilterMode, years } from './FilterMode';
-import { DataDisplay, useDataDisplay } from './DataDisplay';
+import { useDataDisplay } from './DataDisplay';
+import { getFormattedPace, formatSecondsToMMSS } from './utils';
+import { EffortTooltipLabel } from './EffortTooltipLabel';
 
 type SortBy =
   | {
@@ -63,35 +65,6 @@ const sortLeaderboard = (unclonedLeaderboard: InvitationalAthlete[], sortBy: Sor
 
 const getIcon = (sortBy: SortBy, type: 'rank' | 'name') =>
   sortBy.type === type ? sortBy.inverted ? <HiChevronUp /> : <HiChevronDown /> : <HiChevronUpDown />;
-
-const EffortTooltipLabel = (props: {
-  leaderboardEffort: LeaderboardInvitationalEffort;
-  allAthleteEffortsForInvitatinal: InvitationalEffort[];
-}) => {
-  const { leaderboardEffort, allAthleteEffortsForInvitatinal } = props;
-  const effortsReversed = [...allAthleteEffortsForInvitatinal].reverse();
-  const extraInfo = (
-    <>
-      <Divider style={{ width: '100%' }} />
-      {effortsReversed.map((curEffort, i) => (
-        <Text key={curEffort.activity + i}>
-          {curEffort.invitational.year}: {getDurationInMMSS(curEffort)}
-          {curEffort.invitational.distance &&
-            ` (${calculatePace(curEffort.duration, curEffort.invitational.distance)})`}
-        </Text>
-      ))}
-    </>
-  );
-  return (
-    <Stack spacing="xs" align="flex-start">
-      <Text>
-        {`${leaderboardEffort.effort.invitational.year}: `}
-        Rank: {leaderboardEffort.effort.localRank} – Points: {leaderboardEffort.points}
-      </Text>
-      {extraInfo}
-    </Stack>
-  );
-};
 
 const PointsTooltipLabel = (props: { athlete: InvitationalAthlete; invitationals: Invitational[] }) => {
   const { athlete, invitationals } = props;
@@ -545,9 +518,11 @@ export const InvitationalEffortTable = (props: Props) => {
                     const getMetricToDisplay: () => string = () => {
                       switch (dataDisplay) {
                         case 'duration':
-                          return getDurationInMMSS(invitationalEffort.effort) + prTag;
+                          return formatSecondsToMMSS(invitationalEffort.effort.duration) + prTag;
                         case 'pace':
-                          return calculatePace(invitationalEffort.effort.duration, invitational.distance, '') + prTag;
+                          return (
+                            getFormattedPace(invitationalEffort.effort.duration, invitational.distance, '') + prTag
+                          );
                         case 'behindWinner':
                           return calculatePctBehindWinner(invitationalEffort.effort, allEfforts);
                       }
@@ -561,7 +536,7 @@ export const InvitationalEffortTable = (props: Props) => {
                               label={
                                 <EffortTooltipLabel
                                   leaderboardEffort={invitationalEffort}
-                                  allAthleteEffortsForInvitatinal={allAthleteEffortsForInvitatinal}
+                                  allAthleteEffortsForInvitational={allAthleteEffortsForInvitatinal}
                                 />
                               }
                               position="left"
@@ -574,7 +549,7 @@ export const InvitationalEffortTable = (props: Props) => {
                             label={
                               <EffortTooltipLabel
                                 leaderboardEffort={invitationalEffort}
-                                allAthleteEffortsForInvitatinal={allAthleteEffortsForInvitatinal}
+                                allAthleteEffortsForInvitational={allAthleteEffortsForInvitatinal}
                               />
                             }
                             position="left"
@@ -644,21 +619,6 @@ const getDisplayedName = (athlete: InvitationalAthlete, allEfforts: Invitational
   if (allNames.some(otherAthleteName => otherAthleteName.split(' ')[0] === firstName && name !== otherAthleteName))
     return `${firstName} ${splitted[splitted.length - 1]?.[0]}.`;
   return firstName;
-};
-
-const getDurationInMMSS = (effort: InvitationalEffort) => {
-  const minutes = Math.floor(effort.duration / 60);
-  const seconds = Math.floor(effort.duration % 60);
-  const secondsPadding = seconds < 10 ? '0' : '';
-  return `${minutes}:${secondsPadding}${seconds}`;
-};
-
-const calculatePace = (durationInSec: number, distanceInMeters: number, postfix: string = '/km') => {
-  const secPerKM = (durationInSec * 1000) / distanceInMeters;
-  const minutes = Math.floor(secPerKM / 60);
-  const seconds = Math.floor(secPerKM % 60);
-  const secondsPadding = seconds < 10 ? '0' : '';
-  return `${minutes}:${secondsPadding}${seconds}${postfix}`;
 };
 
 const calculatePctBehindWinner = (currentEffort: InvitationalEffort, efforts: ClubEfforts) => {
