@@ -1,8 +1,7 @@
 import React from 'react';
-import { useLocalStorage, useMediaQuery } from '@mantine/hooks';
+import { useLocalStorage } from '@mantine/hooks';
 
 const DataModeContext = React.createContext<{
-  disabled: boolean;
   dataMode: boolean;
   setDataMode: (b: boolean) => void;
 } | null>(null);
@@ -12,12 +11,7 @@ export const DataModeContextProvider = (props: { children: React.ReactNode }) =>
     key: 'dataMode',
     defaultValue: false,
   });
-  const isTouchScreen = useMediaQuery('(pointer: coarse)');
-  return (
-    <DataModeContext.Provider value={{ disabled: isTouchScreen, dataMode, setDataMode }}>
-      {props.children}
-    </DataModeContext.Provider>
-  );
+  return <DataModeContext.Provider value={{ dataMode, setDataMode }}>{props.children}</DataModeContext.Provider>;
 };
 
 export const useDataMode = () => {
