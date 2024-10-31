@@ -491,7 +491,7 @@ export const InvitationalEffortTable = (props: Props) => {
                     </Flex>
                   </td>
                   <td>
-                    {athlete.profile ? <Anchor href={`http://www.strava.com${athlete.profile}`}>{Name}</Anchor> : Name}
+                    {athlete.profile ? <Anchor href={athlete.profile}>{Name}</Anchor> : Name}
                   </td>
                   {invitationals.map((invitational, i) => {
                     const invitationalEffort = athlete.efforts[invitational.id];
@@ -531,7 +531,7 @@ export const InvitationalEffortTable = (props: Props) => {
                     return (
                       <td key={athlete.profile + '-seg-' + i}>
                         {invitationalEffort.effort.activity ? (
-                          <Anchor href={`http://strava.com${invitationalEffort.effort.activity}`}>
+                          <Anchor href={invitationalEffort.effort.activity}>
                             <Tooltip
                               label={
                                 <EffortTooltipLabel
@@ -608,7 +608,7 @@ const InvitationalTitle = (props: { invitational: Invitational; titleType: Title
   })();
 
   if (!invitational.segment) return <>{title} </>;
-  return <Anchor href={`http://www.strava.com${invitational.segment}`}>{title}</Anchor>;
+  return <Anchor href={invitational.segment}>{title}</Anchor>;
 };
 
 const getDisplayedName = (athlete: InvitationalAthlete, allEfforts: InvitationalEffortGroup[]) => {
