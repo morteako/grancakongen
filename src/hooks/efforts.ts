@@ -47,7 +47,7 @@ const clubEfforts: ClubEffortsFromApi = {
   invitationalEfforts: [
     {
       invitational: {
-        name: 'Soria',
+        name: 'Soriaxx',
         shortName: 'Soria',
         initials: 'SO',
         id: 'Soria2024',
